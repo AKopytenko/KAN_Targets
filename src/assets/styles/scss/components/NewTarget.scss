@@ -1,0 +1,12 @@
+.ktg-newTarget {
+
+    &__btnModal {
+
+        float: right;
+
+        @media (max-width: 767px) {
+            float: none;
+            width: 100%;
+        }
+    }
+}
