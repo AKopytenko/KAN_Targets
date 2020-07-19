@@ -1,0 +1,27 @@
+.ktg-targets {
+
+    &__header {
+        
+        padding: 0 0 1.5rem;
+        border-bottom: 1px solid #ddd;
+
+        &Logo {
+            font-size: 28px;
+            font-weight: 300;
+            color: #555;
+        }
+    }
+}
+
+.target {
+
+    &__name {
+
+        font-weight: 400;
+
+        &_priority {
+
+            color:#ff0000;
+        }
+    }
+}

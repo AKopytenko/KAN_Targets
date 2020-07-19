@@ -2,19 +2,19 @@ export default {
 
     state: {
         
-        targets: []
+        targets: [],
+        newTargetMsg: null
     },
     getters: {
 
-        getTargets: state => state.targets
+        getTargets: state => state.targets,
+        newTargetMsg: state => state.newTargetMsg
     },
     actions: {
 
         addTargets ({state}) {
             
             const localTargets = JSON.parse(localStorage.getItem('KTG_LIST'))
-
-            console.log( 'ЛОКАЛЬНЫЕ: ', localTargets )
 
             if(localTargets) {
                 state.targets = localTargets
@@ -30,11 +30,14 @@ export default {
                 created: tardetData.created
             }
             
-            state.targets.push(newTarget)
-
-            localStorage.setItem('KTG_LIST', JSON.stringify(state.targets))
-
-            dispatch('addTargets')
+            try {
+                state.targets.push(newTarget)
+                localStorage.setItem('KTG_LIST', JSON.stringify(state.targets))
+                dispatch('addTargets')
+                state.newTargetMsg = { error: false, success: 'Новая задача успешно добавлена.' }
+            } catch {
+                state.newTargetMsg = { error: 'Ошибка добавления задачи!', success: false }
+            }
         }
     }
 }
