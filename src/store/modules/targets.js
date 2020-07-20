@@ -12,6 +12,11 @@ export default {
     },
     actions: {
 
+        /**
+         * Добавляет в приложение задачи из localStorage при заходе или обновлении страницы
+         * 
+         * @param {Object} state - служебное свойство VueX (текущее состояние хранилища), не передаётся при вызове 
+         */
         addTargets ({state}) {
             
             const localTargets = JSON.parse(localStorage.getItem('KTG_LIST'))
@@ -21,6 +26,12 @@ export default {
             }
         },
 
+        /**
+         * Добавляет новую задачу
+         * 
+         * @param {Object} state      - служебное свойство VueX (текущее состояние хранилища), не передаётся при вызове 
+         * @param {Object} targetData - значения полей формы для добавления новой задачи
+         */
         addTarget ({state}, targetData) {
 
             let newTarget = {
@@ -50,6 +61,24 @@ export default {
             } catch {
                 state.newTargetMsg = { error: 'Ошибка добавления задачи!', success: false }
             }
+        },
+
+        /**
+         * Удаляет задачу с указанным ID
+         * 
+         * @param {Object} state - служебное свойство VueX (текущее состояние хранилища), не передаётся при вызове 
+         * @param {Number} id    - ID удаляемой задачи
+         */
+        removeTarget({state}, id) {
+
+            let newTargets = []
+            state.targets.map( target => {
+                if(target.id !== id) {
+                    newTargets.push(target)
+                }
+            })
+            state.targets = newTargets
+            localStorage.setItem('KTG_LIST', JSON.stringify(state.targets))
         }
     }
 }

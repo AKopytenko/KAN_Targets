@@ -18,6 +18,7 @@
                             <h3 class="target__name collapsed" :class="{ 'target__name_priority' : target.priority }" type="button" data-toggle="collapse" :data-target="'#target-' + target.created" aria-expanded="false" :aria-controls="'target-' + target.created">
                                 {{ target.name }}
                             </h3>
+                            <a href="#" class="target__remove" @click.prevent="removeTarget(target.id)">&times;</a>
                         </div>
                         <div :id="'target-' + target.created" class="collapse target__content" aria-labelledby="headingOne" data-parent="#targetsList">
                             <div class="card-body target__body">
@@ -53,7 +54,7 @@ export default {
     },
     methods: {
 
-        ...mapActions(['addTargets'])
+        ...mapActions(['addTargets', 'removeTarget'])
     },
     mounted() {
 
