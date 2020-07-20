@@ -1,6 +1,6 @@
 <template>
     <div class="ktg-newTarget">
-        <a href="#" class="btn btn-primary mt-4 mt-sm-0 ktg-newTarget__btnModal" data-toggle="modal" data-target="#newTargetModalAdd" aria-hidden="true">Новая цель</a>
+        <a href="#" class="btn btn-primary mt-4 mt-sm-0 ktg-newTarget__btnModal" data-toggle="modal" data-target="#newTargetModalAdd" aria-hidden="true">Новая задача</a>
         <div class="modal fade ktg-newTarget__modalAdd" tabindex="-1" role="dialog" id="newTargetModalAdd">
             <div class="modal-dialog">
                 <div class="modal-content">
