@@ -69,8 +69,8 @@ export default {
         /**
          * Обновляет задачу с указанным ID
          * 
-         * @param {Object} state - служебное свойство VueX (текущее состояние хранилища), не передаётся при вызове 
-         * @param {Number} id    - ID удаляемой задачи
+         * @param {Object} state      - служебное свойство VueX (текущее состояние хранилища), не передаётся при вызове 
+         * @param {Object} targetData - значения полей формы редактирования задачи
          */
         editTarget({state}, targetData) {
 
