@@ -22,7 +22,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="targetDescr">Описание</label>
-                                <textarea class="form-control" id="targetDescr" aria-describedby="targetDescrHelp" required></textarea>
+                                <textarea class="form-control" id="targetDescr" rows="5" aria-describedby="targetDescrHelp" required></textarea>
                             </div>
                             <div class="form-group form-check">
                                 <input type="checkbox" class="form-check-input" id="targetPriority" aria-describedby="targetPriorityHelp">

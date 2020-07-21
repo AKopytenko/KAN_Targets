@@ -14,19 +14,7 @@
             <div class="ktg-targets__list my-4" v-if="getTargets">
                 <div class="accordion" id="targetsList">
                     <div class="card ktg-targets__card target" v-for="target in getTargets" :key="target.created">
-                        <div class="card-header target__header" id="headingOne">
-                            <h3 class="target__name collapsed" :class="{ 'target__name_priority' : target.priority }" type="button" data-toggle="collapse" :data-target="'#target-' + target.created" aria-expanded="false" :aria-controls="'target-' + target.created">
-                                {{ target.name }}
-                            </h3>
-                            <a href="#" class="target__remove" @click.prevent="removeTarget(target.id)">&times;</a>
-                        </div>
-                        <div :id="'target-' + target.created" class="collapse target__content" aria-labelledby="headingOne" data-parent="#targetsList">
-                            <div class="card-body target__body">
-                                <div class="target__text">{{ target.descr }}</div>
-                                <hr>
-                                <div class="target_created">Добавлена: {{ new Date(target.created * 1000).toLocaleString() }}</div>
-                            </div>
-                        </div>
+                        <Target :target="target" />
                     </div>
                 </div>
             </div>
@@ -40,12 +28,14 @@
 <script>
 import { mapGetters, mapActions } from 'vuex'
 
+import Target from './Target'
 import NewTarget from './NewTarget'
 
 export default {
     name: 'Targets',
     components: {
 
+        Target,
         NewTarget
     },
     computed: {
@@ -54,7 +44,7 @@ export default {
     },
     methods: {
 
-        ...mapActions(['addTargets', 'removeTarget'])
+        ...mapActions(['addTargets'])
     },
     mounted() {
 

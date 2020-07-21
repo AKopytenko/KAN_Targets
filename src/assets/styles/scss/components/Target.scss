@@ -1,0 +1,39 @@
+.target {
+
+    &__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    &__remove {
+        cursor: pointer;
+        opacity: 0.4;
+        color: #777;
+        font-size: 30px;
+        font-weight: 600;
+
+        &:hover {
+            color: #777;
+            text-decoration: none;
+            opacity: 1;
+        }
+    }
+
+    &__name {
+        width: 100%;
+        font-weight: 400;
+        margin: 0;
+
+        &_priority {
+            color:#ff0000;
+        }
+    }
+
+    &__footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-top: 1px solid #ddd;
+    }
+}

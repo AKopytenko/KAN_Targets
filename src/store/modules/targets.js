@@ -3,12 +3,15 @@ export default {
     state: {
         
         targets: [],
-        newTargetMsg: null
+
+        newTargetMsg: null,
+        editTargetMsg: null
     },
     getters: {
 
         getTargets: state => state.targets,
-        newTargetMsg: state => state.newTargetMsg
+        newTargetMsg: state => state.newTargetMsg,
+        editTargetMsg: state => state.editTargetMsg
     },
     actions: {
 
@@ -60,6 +63,34 @@ export default {
                 state.newTargetMsg = { error: false, success: 'Новая задача успешно добавлена.' }
             } catch {
                 state.newTargetMsg = { error: 'Ошибка добавления задачи!', success: false }
+            }
+        },
+
+        /**
+         * Обновляет задачу с указанным ID
+         * 
+         * @param {Object} state - служебное свойство VueX (текущее состояние хранилища), не передаётся при вызове 
+         * @param {Number} id    - ID удаляемой задачи
+         */
+        editTarget({state}, targetData) {
+
+            try {
+
+                state.targets.map( target => {
+                    if(target.id == targetData.id) {
+                        target.name = targetData.name
+                        target.descr = targetData.descr
+                    }
+                })
+                
+                localStorage.removeItem('KTG_LIST')
+                localStorage.setItem('KTG_LIST', JSON.stringify(state.targets))
+
+                state.editTargetMsg = { success: true, text: 'Задача успешно отредактирована' }
+
+            } catch {
+
+                state.editTargetMsg = { success: false, text: 'Ошибка при попытке редактирования задачи!' }
             }
         },
 
