@@ -86,11 +86,11 @@ export default {
                 localStorage.removeItem('KTG_LIST')
                 localStorage.setItem('KTG_LIST', JSON.stringify(state.targets))
 
-                state.editTargetMsg = { success: true, text: 'Задача успешно отредактирована' }
+                state.editTargetMsg = { success: true, text: 'Задача успешно отредактирована', id: targetData.id }
 
             } catch {
 
-                state.editTargetMsg = { success: false, text: 'Ошибка при попытке редактирования задачи!' }
+                state.editTargetMsg = { success: false, text: 'Ошибка при попытке редактирования задачи!', id: targetData.id }
             }
         },
 

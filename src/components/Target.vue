@@ -9,21 +9,32 @@
                 :data-target="'#target-' + target.created" 
                 aria-expanded="false" 
                 :aria-controls="'target-' + target.created" 
-                v-if="!showEditForm">
+                v-if="!editForm">
                     {{ target.name }}
             </h3>
-            <input v-model="target.name" type="text" id="targetEditName" class="form-control target__nameEdit" v-if="showEditForm">
+            <input v-model="target.name" type="text" id="targetEditName" class="form-control target__nameEdit" v-if="editForm">
             <a href="#" class="target__remove ml-3" @click.prevent="removeTarget(target.id)">&times;</a>
         </div>
         <div :id="'target-' + target.created" class="collapse target__content" aria-labelledby="headingOne" data-parent="#targetsList">
             <div class="card-body target__body">
-                <div class="target__status" v-if="editTargetMsg">
-                    <div class="alert alert-success" v-if="editTargetMsg.success">{{ editTargetMsg.text }}</div>
-                    <div class="alert alert-danger" v-if="!editTargetMsg.success">{{ editTargetMsg.text }}</div>
+                <div class="target__status" v-if="editFormMsg">
+                    <div 
+                        class="alert" 
+                        :class="{ 
+                            'alert-success': editFormMsg.success, 
+                            'alert-danger': !editFormMsg.success 
+                        }" 
+                        v-if="editFormMsg.success"
+                    >
+                        {{ editFormMsg.text }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
                 </div>
                 <div class="target__descr">
-                    <span class="target__descrText" v-if="!showEditForm">{{ target.descr }}</span>
-                    <textarea v-model="target.descr" id="targetEditDescr" class="form-control target__descrEdit" v-if="showEditForm" rows="6"></textarea>
+                    <span class="target__descrText" v-if="!editForm">{{ target.descr }}</span>
+                    <textarea v-model="target.descr" id="targetEditDescr" class="form-control target__descrEdit" v-if="editForm" rows="6"></textarea>
                 </div>
                 <div class="target__footer mt-4 pt-3">
                     <div class="target__created">Добавлена: {{ new Date(target.created * 1000).toLocaleString() }}</div>
@@ -31,24 +42,24 @@
                     <input 
                         class="btn btn-primary target__editShow" 
                         type="button"
-                        @click.prevent="showEditForm = true" 
-                        v-if="!showEditForm"
                         value="Редактировать"
+                        @click.prevent="showEditForm(true)" 
+                        v-if="!editForm"
                     >
 
                     <input 
                         class="btn btn-light target__editHide"
                         type="button" 
-                        @click.prevent="showEditForm = false"
-                        v-if="showEditForm"
                         value="Отмена" 
+                        @click.prevent="showEditForm(false)"
+                        v-if="editForm"
                     >
 
                     <input 
                         class="btn btn-primary target__editSave" 
                         type="submit"
-                        v-if="showEditForm"
                         value="Сохранить"
+                        v-if="editForm"
                     >
 
                 </div>
@@ -71,12 +82,19 @@ export default {
     },
     data() {
         return {
-            showEditForm: false
+            editForm: false,
+            editFormMsg: null
         }
     },
     methods: {
 
         ...mapActions(['editTarget', 'removeTarget']),
+
+        showEditForm(mode) {
+
+            this.editForm = mode
+            this.editFormMsg = null
+        },
 
         sendEditTarget($event) {
 
@@ -94,9 +112,13 @@ export default {
 
         editTargetMsg(msg) {
 
-            if(msg.success) {
+            if(msg.id == this.target.id) {
 
-                this.showEditForm = false
+                this.editFormMsg = msg
+
+                if(msg.success) {
+                    this.editForm = false
+                }
             }
         }
     }
