@@ -35,5 +35,44 @@
         align-items: center;
         justify-content: space-between;
         border-top: 1px solid #ddd;
+
+        @media (max-width: 767px) {
+            flex-wrap: wrap;
+        }
+    }
+
+    &__edit {
+
+        &Show {
+
+            @media (max-width: 767px) {
+                width: 100%
+            }
+        }
+
+        &Hide {
+            margin-left: auto
+        }
+
+        &Save {
+            margin-left: 1.5rem
+        }
+
+        &Hide,
+        &Save {
+
+            @media (max-width: 767px) {
+                width: 47%;
+                margin: 0;
+            }
+        }
+    }
+
+    &__created {
+
+        @media (max-width: 767px) {
+            width: 100%;
+            margin: 0 0 1.5rem;
+        }
     }
 }

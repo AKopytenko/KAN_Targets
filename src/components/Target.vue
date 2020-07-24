@@ -19,7 +19,7 @@
             <div class="card-body target__body">
                 <div class="target__status" v-if="editTargetMsg">
                     <div class="alert alert-success" v-if="editTargetMsg.success">{{ editTargetMsg.text }}</div>
-                    <div class="alert alert-success" v-if="!editTargetMsg.success">{{ editTargetMsg.text }}</div>
+                    <div class="alert alert-danger" v-if="!editTargetMsg.success">{{ editTargetMsg.text }}</div>
                 </div>
                 <div class="target__descr">
                     <span class="target__descrText" v-if="!showEditForm">{{ target.descr }}</span>
@@ -29,7 +29,7 @@
                     <div class="target__created">Добавлена: {{ new Date(target.created * 1000).toLocaleString() }}</div>
                     
                     <input 
-                        class="btn btn-light target__editShow" 
+                        class="btn btn-primary target__editShow" 
                         type="button"
                         @click.prevent="showEditForm = true" 
                         v-if="!showEditForm"
@@ -37,7 +37,15 @@
                     >
 
                     <input 
-                        class="btn btn-light target__editSave" 
+                        class="btn btn-light target__editHide"
+                        type="button" 
+                        @click.prevent="showEditForm = false"
+                        v-if="showEditForm"
+                        value="Отмена" 
+                    >
+
+                    <input 
+                        class="btn btn-primary target__editSave" 
                         type="submit"
                         v-if="showEditForm"
                         value="Сохранить"
