@@ -1,7 +1,7 @@
 <template>
-    <div class="ktg-newTarget">
-        <a href="#" class="btn btn-primary mt-4 mt-sm-0 ktg-newTarget__btnModal" data-toggle="modal" data-target="#newTargetModalAdd" aria-hidden="true">Новая задача</a>
-        <div class="modal fade ktg-newTarget__modalAdd" tabindex="-1" role="dialog" id="newTargetModalAdd">
+    <div class="ktg-createTarget">
+        <a href="#" class="btn btn-primary mt-4 mt-sm-0 ktg-createTarget__btnModal" data-toggle="modal" data-target="#createTargetModal" aria-hidden="true">Новая задача</a>
+        <div class="modal fade ktg-createTarget__modalAdd" tabindex="-1" role="dialog" id="createTargetModal">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -10,11 +10,11 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <form class="ktg-newTarget__form" action="/" method="post" @submit.prevent="sendTargetForm($event)" id="newTargetForm">
+                    <form class="ktg-createTarget__form" action="/" method="post" @submit.prevent="sendTargetForm($event)" id="createTargetForm">
                         <div class="modal-body">
-                            <div class="ktg-newTarget__result" v-if="newTargetFormMsg">
-                                <div class="alert alert-success" v-if="newTargetFormMsg.success">{{ newTargetFormMsg.success }}</div>
-                                <div class="alert alert-danger" v-if="newTargetFormMsg.error">{{ newTargetFormMsg.error }}</div>
+                            <div class="ktg-createTarget__result" v-if="createTargetFormMsg">
+                                <div class="alert alert-success" v-if="createTargetFormMsg.success">{{ createTargetFormMsg.success }}</div>
+                                <div class="alert alert-danger" v-if="createTargetFormMsg.error">{{ createTargetFormMsg.error }}</div>
                             </div>
                             <div class="form-group">
                                 <label for="targetName">Название</label>
@@ -26,7 +26,7 @@
                             </div>
                             <div class="form-group form-check">
                                 <input type="checkbox" class="form-check-input" id="targetPriority" aria-describedby="targetPriorityHelp">
-                                <label class="form-check-label" for="targetPriority">Приоритетная цель</label>
+                                <label class="form-check-label" for="targetPriority">Приоритетная задача</label>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -45,19 +45,19 @@ import $ from 'jquery'
 import { mapGetters, mapActions } from 'vuex'
 
 export default {
-    name: 'NewTarget.vue',
+    name: 'CreateTarget.vue',
     data() {
         return {
-            newTargetFormMsg: null
+            createTargetFormMsg: null
         }
     },
     computed: {
 
-        ...mapGetters(['getTargets', 'newTargetMsg'])
+        ...mapGetters(['getTargets', 'getCreateTargetMsg'])
     },
     methods: {
 
-        ...mapActions(['addTarget', 'addTarget']),
+        ...mapActions(['createTarget']),
 
         sendTargetForm($event) {
 
@@ -70,23 +70,23 @@ export default {
                 created: (Date.now() / 1000).toFixed()
             }
 
-            this.addTarget(tardetData)
+            this.createTarget(tardetData)
         }
     },
     mounted() {
 
         const self = this
 
-        $('#newTargetModalAdd').on('hidden.bs.modal', function() {
-            self.newTargetFormMsg = null
+        $('#createTargetModal').on('hidden.bs.modal', function() {
+            self.createTargetFormMsg = null
         })
     },
     watch: {
 
-        newTargetMsg(msg) {
-            this.newTargetFormMsg = msg
+        getCreateTargetMsg(msg) {
+            this.createTargetFormMsg = msg
             if('success' in msg) {
-                document.querySelector('#newTargetForm').reset()
+                document.querySelector('#createTargetForm').reset()
             }
         }
     }

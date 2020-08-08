@@ -6,7 +6,7 @@
         justify-content: space-between;
     }
 
-    &__remove {
+    &__delete {
         cursor: pointer;
         opacity: 0.4;
         color: #777;
@@ -41,7 +41,7 @@
         }
     }
 
-    &__edit {
+    &__update {
 
         &Show {
 

@@ -1,71 +1,84 @@
 <template>
-    <form action="/" @submit.prevent="sendEditTarget($event)">
-        <div class="card-header target__header" id="headingOne">
-            <h3 class="target__name collapsed" 
-                :class="{ 'target__name_priority' 
-                : target.priority }" 
-                type="button" 
-                data-toggle="collapse" 
-                :data-target="'#target-' + target.created" 
-                aria-expanded="false" 
-                :aria-controls="'target-' + target.created" 
-                v-if="!editForm">
-                    {{ target.name }}
-            </h3>
-            <input v-model="target.name" type="text" id="targetEditName" class="form-control target__nameEdit" v-if="editForm">
-            <a href="#" class="target__remove ml-3" @click.prevent="removeTarget(target.id)">&times;</a>
-        </div>
-        <div :id="'target-' + target.created" class="collapse target__content" aria-labelledby="headingOne" data-parent="#targetsList">
-            <div class="card-body target__body">
-                <div class="target__status" v-if="editFormMsg">
-                    <div 
-                        class="alert" 
-                        :class="{ 
-                            'alert-success': editFormMsg.success, 
-                            'alert-danger': !editFormMsg.success 
-                        }" 
-                        v-if="editFormMsg.success"
-                    >
-                        {{ editFormMsg.text }}
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+    <div class="target">
+        <form action="/" @submit.prevent="sendUpdateTarget($event)">
+            <div class="card-header target__header" id="headingOne">
+                <h3 class="target__name collapsed" 
+                    :class="{ 'target__name_priority' 
+                    : target.priority }" 
+                    type="button" 
+                    data-toggle="collapse" 
+                    :data-target="'#target-' + target.created" 
+                    aria-expanded="false" 
+                    :aria-controls="'target-' + target.created" 
+                    v-if="!updateForm"
+                >
+                        {{ target.name }}
+                </h3>
+                <input v-model="target.name" type="text" id="targetUpdateName" class="form-control target__nameUpdate" v-if="updateForm">
+                <a 
+                    href="#" 
+                    class="target__delete ml-3" 
+                    data-toggle="modal" 
+                    data-target="#deleteTargetModal"
+                    @click.prevent="$emit('delete-target-id', target.id)"
+                >
+                    &times;
+                </a>
+            </div>
+            <div :id="'target-' + target.created" class="collapse target__content" aria-labelledby="headingOne" data-parent="#targetsList">
+                <div class="card-body target__body">
+                    <div class="target__status" v-if="updateFormMsg">
+                        <div 
+                            class="alert" 
+                            :class="{ 
+                                'alert-success': updateFormMsg.success, 
+                                'alert-danger': !updateFormMsg.success 
+                            }" 
+                            v-if="updateFormMsg.success"
+                        >
+                            {{ updateFormMsg.text }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="target__descr">
+                        <span class="target__descrText" v-if="!updateForm">{{ target.descr }}</span>
+                        <textarea v-model="target.descr" id="targetUpdateDescr" class="form-control target__descrUpdate" v-if="updateForm" rows="6"></textarea>
+                    </div>
+                    <div class="target__footer mt-4 pt-3">
+                        <div class="target__created">Добавлена: {{ new Date(target.created * 1000).toLocaleString() }}</div>
+                        
+                        <input 
+                            class="btn btn-primary target__updateShow" 
+                            type="button"
+                            value="Редактировать"
+                            @click.prevent="showUpdateForm(true)" 
+                            v-if="!updateForm"
+                        >
+
+                        <input 
+                            class="btn btn-light target__updateHide"
+                            type="button" 
+                            value="Отмена" 
+                            @click.prevent="showUpdateForm(false)"
+                            v-if="updateForm"
+                        >
+
+                        <input 
+                            class="btn btn-primary target__updateSave" 
+                            type="submit"
+                            value="Сохранить"
+                            v-if="updateForm"
+                        >
+
+                        <input type="hidden" id="targetID" :value="target.id">
+
                     </div>
                 </div>
-                <div class="target__descr">
-                    <span class="target__descrText" v-if="!editForm">{{ target.descr }}</span>
-                    <textarea v-model="target.descr" id="targetEditDescr" class="form-control target__descrEdit" v-if="editForm" rows="6"></textarea>
-                </div>
-                <div class="target__footer mt-4 pt-3">
-                    <div class="target__created">Добавлена: {{ new Date(target.created * 1000).toLocaleString() }}</div>
-                    
-                    <input 
-                        class="btn btn-primary target__editShow" 
-                        type="button"
-                        value="Редактировать"
-                        @click.prevent="showEditForm(true)" 
-                        v-if="!editForm"
-                    >
-
-                    <input 
-                        class="btn btn-light target__editHide"
-                        type="button" 
-                        value="Отмена" 
-                        @click.prevent="showEditForm(false)"
-                        v-if="editForm"
-                    >
-
-                    <input 
-                        class="btn btn-primary target__editSave" 
-                        type="submit"
-                        value="Сохранить"
-                        v-if="editForm"
-                    >
-
-                </div>
             </div>
-        </div>
-    </form>
+        </form>
+    </div>
 </template>
 
 <script>
@@ -78,46 +91,46 @@ export default {
     },
     computed: {
 
-        ...mapGetters(['editTargetMsg'])
+        ...mapGetters(['getTargets', 'getUpdateTargetMsg'])
     },
     data() {
         return {
-            editForm: false,
-            editFormMsg: null
+            updateForm: false,
+            updateFormMsg: null
         }
     },
     methods: {
 
-        ...mapActions(['editTarget', 'removeTarget']),
+        ...mapActions(['updateTarget']),
 
-        showEditForm(mode) {
+        showUpdateForm(mode) {
 
-            this.editForm = mode
-            this.editFormMsg = null
+            this.updateForm = mode
+            this.updateFormMsg = null
         },
 
-        sendEditTarget($event) {
+        sendUpdateTarget($event) {
 
             const formFields = $event.target.elements
             const formData = {
-                id: this.target.id,
-                name: formFields.targetEditName.value,
-                descr: formFields.targetEditDescr.value
+                id: formFields.targetID.value,
+                name: formFields.targetUpdateName.value,
+                descr: formFields.targetUpdateDescr.value
             }
 
-            this.editTarget(formData)
+            this.updateTarget(formData)
         }
     },
     watch: {
 
-        editTargetMsg(msg) {
+        getUpdateTargetMsg(msg) {
 
             if(msg.id == this.target.id) {
 
-                this.editFormMsg = msg
+                this.updateFormMsg = msg
 
                 if(msg.success) {
-                    this.editForm = false
+                    this.updateForm = false
                 }
             }
         }
