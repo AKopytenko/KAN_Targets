@@ -17,41 +17,53 @@
                 data-toggle="modal" 
                 data-target="#importTargetsModal" 
                 aria-hidden="true"
+                @clock.prevent="importTargetsMsg = null"
             >
                 Загрузить
             </button>
         </div>
-        <div class="modal fade" id="importTargetsModal" tabindex="-1" aria-labelledby="importTargetsModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="importTargetsModalLabel">Загружить задачи из файла</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <div class="modal fade ktg-import__modal" id="importTargetsModal" tabindex="-1" aria-labelledby="importTargetsModalLabel" aria-hidden="true">
+            <div class="modal-dialog ktg-import__modalDialog">
+                <div class="modal-content ktg-import__modalContent">
+                    <div class="modal-header ktg-import__modalHeader">
+                        <h5 class="modal-title ktg-import__modalTitle" id="importTargetsModalLabel">Загружить задачи из файла</h5>
+                        <button type="button" class="close ktg-import__modalClose" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <form action="/" method="post" id="importTargetsForm" @submit.prevent="uploadTargets($event)">
-                        <div class="modal-body">
-                            <div class="form-group">
-                                Выберите вариант загрузки:
-                                <ul>
+                    <form class="ktg-import__modalForm" action="/" method="post" id="importTargetsForm" @submit.prevent="uploadTargets($event)">
+                        <div class="modal-body ktg-import__modalBody">
+                            <div class="ktg-import__modalResult" v-if="importTargetsMsg">
+                                <div 
+                                    class="alert"
+                                    :class="{
+                                        'alert-success' : importTargetsMsg.success,
+                                        'alert-danger' : !importTargetsMsg.success
+                                    }"
+                                >
+                                    {{ importTargetsMsg.text }}
+                                </div>
+                            </div>
+                            <div class="form-group ktg-import__modalFormGroup">
+                                Способ загрузки:
+                                <ul class="ktg-import__modalFormLabel">
                                     <li><strong>Добавить:</strong> задачи из файла будут добавлены к уже существующим;</li>
                                     <li><strong>Перезаписать:</strong> существующие задачи будут УДАЛЕНЫ, после загрузки останутся только задачи из файла.</li>
                                 </ul>
-                                <select id="importTargetsType" class="custom-select">
+                                <select id="importTargetsType" class="custom-select ktg-import__modalFormInput">
                                     <option value="" selected disabled>...</option>
-                                    <option value="push">Добавить</option>
+                                    <option value="push" disabled>Добавить</option>
                                     <option value="rewrite">Перезаписать</option>
                                 </select>
                             </div>
-                            <div class="form-group">
-                                <label for="importTargetsFile">Файл задач:</label>
-                                <input type="file" id="importTargetsFile" class="form-control-file" accept=".txt">
+                            <div class="form-group ktg-import__modalFormGroup">
+                                <label for="importTargetsFile" class="ktg-import__modalFormLabel">Файл задач:</label>
+                                <input type="file" id="importTargetsFile" class="form-control-file ktg-import__modalFormInput" accept=".txt">
                             </div>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-light" data-dismiss="modal">Отмена</button>
-                            <button type="submit" class="btn btn-primary">Загрузить</button>
+                        <div class="modal-footer ktg-import__modalFooter">
+                            <button type="button" class="btn btn-light ktg-import__modalBtn" data-dismiss="modal">Отмена</button>
+                            <button type="submit" class="btn btn-primary ktg-import__modalBtn">Загрузить</button>
                         </div>
                     </form>
                 </div>
@@ -67,6 +79,14 @@ export default {
 
     name: 'ImportTargets',
 
+    data() {
+
+        return {
+
+            importTargetsMsg: null
+        }
+    },
+
     computed: {
 
         ...mapGetters([
@@ -79,7 +99,7 @@ export default {
 
         ...mapMutations([
 
-            'importTargets'
+            'setTargets'
         ]),
 
         downloadTargets() {
@@ -112,9 +132,6 @@ export default {
             if(fields.importTargetsType.value) {
 
                 data.type = fields.importTargetsType.value
-            } else {
-
-                false
             }
 
             if(fields.importTargetsFile.value) {
@@ -123,21 +140,63 @@ export default {
 
                     data.file = fields.importTargetsFile.files[0]
                 }
-            } else {
-
-                false
             }
 
-            if(data.type && data.type) {
+            if(data.type && data.file) {
+
+                console.log('Поля заполнены')
                 
-                let reader = new FileReader()
+                const reader = new FileReader()
 
                 reader.readAsText(data.file)
 
-                reader.onload = function(evt) {
+                reader.onload = function(event) {
 
-                    self.importTargets(evt.target.result)
+                    try {
+
+                        const fileContent = JSON.parse(event.target.result)
+
+                        let targets = []
+
+                        for(let target of fileContent) {
+
+                            if(
+                                'name'      in target && 
+                                'descr'     in target && 
+                                'priority'  in target && 
+                                'created'   in target && 
+                                'id'        in target
+                            ) {
+
+                                targets.push({
+
+                                    name: target.name,
+                                    descr: target.descr,
+                                    priority: target.priority,
+                                    created: target.created,
+                                    id: target.id
+                                })
+
+                            } else {
+
+                                self.importTargetsMsg = { success: false, text: 'ОШИБКА: Неверный формат файла!' }
+                                return false
+                            }
+                        }
+                    } catch {
+
+                        self.importTargetsMsg = { success: false, text: 'ОШИБКА: Неверный формат файла!' }
+                        return false
+                    }
+
+                    self.setTargets(event.target.result)
+
+                    self.importTargetsMsg = { success: true, text: 'Задачи успешно загружены' }
                 }
+            } else {
+
+                self.importTargetsMsg = { success: false, text: 'Не заполнено обязательное поле' }
+                return false
             }
         }
     }

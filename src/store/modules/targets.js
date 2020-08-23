@@ -116,7 +116,7 @@ export default {
     },
     mutations: {
 
-        importTargets(state, targets) {
+        setTargets(state, targets) {
 
             state.targets = JSON.parse(targets)
             localStorage.setItem('KTG_LIST', targets)
