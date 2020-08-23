@@ -43,7 +43,7 @@
                         </div>
                     </div>
                     <div class="target__descr">
-                        <span class="target__descrText" v-if="!updateForm">{{ target.descr }}</span>
+                        <span class="target__descrText" v-if="!updateForm" v-html="target.descr.split('\n').join('<br>')"></span>
                         <textarea v-model="target.descr" id="targetUpdateDescr" class="form-control target__descrUpdate" v-if="updateForm" rows="6"></textarea>
                     </div>
                     <div class="target__footer mt-4 pt-3">
@@ -82,26 +82,42 @@
 </template>
 
 <script>
+
 import { mapActions, mapGetters } from 'vuex'
 
 export default {
+
     name: 'Target',
+
     props: {
+
         target: Object
     },
-    computed: {
 
-        ...mapGetters(['getTargets', 'getUpdateTargetMsg'])
-    },
     data() {
+
         return {
+
             updateForm: false,
             updateFormMsg: null
         }
     },
+    
+    computed: {
+
+        ...mapGetters([
+
+            'getTargets', 
+            'getUpdateTargetMsg'
+        ])
+    },
+
     methods: {
 
-        ...mapActions(['updateTarget']),
+        ...mapActions([
+
+            'updateTarget'
+        ]),
 
         showUpdateForm(mode) {
 
@@ -112,7 +128,9 @@ export default {
         sendUpdateTarget($event) {
 
             const formFields = $event.target.elements
+
             const formData = {
+
                 id: formFields.targetID.value,
                 name: formFields.targetUpdateName.value,
                 descr: formFields.targetUpdateDescr.value
@@ -121,6 +139,7 @@ export default {
             this.updateTarget(formData)
         }
     },
+
     watch: {
 
         getUpdateTargetMsg(msg) {
@@ -130,6 +149,7 @@ export default {
                 this.updateFormMsg = msg
 
                 if(msg.success) {
+
                     this.updateForm = false
                 }
             }

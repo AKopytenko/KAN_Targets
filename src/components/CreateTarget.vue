@@ -30,7 +30,7 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                            <button type="button" class="btn btn-light" data-dismiss="modal">Отмена</button>
                             <button type="submit" class="btn btn-primary">Добавить</button>
                         </div>
                     </form>
@@ -41,29 +41,42 @@
 </template>
 
 <script>
+
 import $ from 'jquery'
 import { mapGetters, mapActions } from 'vuex'
 
 export default {
+
     name: 'CreateTarget.vue',
+
     data() {
+
         return {
+
             createTargetFormMsg: null
         }
     },
     computed: {
 
-        ...mapGetters(['getTargets', 'getCreateTargetMsg'])
+        ...mapGetters([
+
+            'getTargets', 
+            'getCreateTargetMsg'
+        ])
     },
     methods: {
 
-        ...mapActions(['createTarget']),
+        ...mapActions([
+
+            'createTarget'
+        ]),
 
         sendTargetForm($event) {
 
             const targetFormFields = $event.target.elements
 
             let tardetData = {
+
                 name: targetFormFields.targetName.value,
                 descr: targetFormFields.targetDescr.value,
                 priority: targetFormFields.targetPriority.checked,
@@ -78,14 +91,18 @@ export default {
         const self = this
 
         $('#createTargetModal').on('hidden.bs.modal', function() {
+
             self.createTargetFormMsg = null
         })
     },
     watch: {
 
         getCreateTargetMsg(msg) {
+
             this.createTargetFormMsg = msg
+
             if('success' in msg) {
+
                 document.querySelector('#createTargetForm').reset()
             }
         }

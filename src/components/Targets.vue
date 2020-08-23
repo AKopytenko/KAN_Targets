@@ -1,7 +1,9 @@
 <template>
     <div class="ktg-targets">
+        
         <div class="container ktg-targets__container">
-            <div class="ktg-targets__header my-4">
+            
+            <div class="ktg-targets__header my-4 pb-4">
                 <div class="row align-items-center">
                     <div class="col-12 col-sm-6">
                         <div class="ktg-targets__headerLogo">KAN-Targets</div>
@@ -11,7 +13,8 @@
                     </div>
                 </div>
             </div>
-            <div class="ktg-targets__list my-4" v-if="getTargets">
+
+            <div class="ktg-targets__list my-4" v-if="getTargets.length">
                 <div class="accordion ktg-targets__accordion" id="targetsList">
                     <div class="card ktg-target__card " v-for="target in getTargets" :key="target.created">
                         <Target 
@@ -21,9 +24,13 @@
                     </div>
                 </div>
             </div>
-            <div class="ktg-targets__empty" v-if="!getTargets.length">
+
+            <div class="ktg-targets__empty my-4" v-if="!getTargets.length">
                 Список задач пуст...
             </div>
+
+            <ImportTargets />
+
         </div>
 
         <div class="modal fade" id="deleteTargetModal" tabindex="-1" aria-labelledby="deleteTargetModalLabel" aria-hidden="true">
@@ -45,14 +52,17 @@
                 </div>
             </div>
         </div>
+
     </div>
 </template>
 
 <script>
+
 import { mapGetters, mapActions } from 'vuex'
 
-import Target from './Target'
-import CreateTarget from './CreateTarget'
+import Target           from './Target'
+import CreateTarget     from './CreateTarget'
+import ImportTargets    from './ImportTargets'
 
 export default {
     name: 'Targets',
@@ -66,7 +76,8 @@ export default {
     components: {
 
         Target,
-        CreateTarget
+        CreateTarget,
+        ImportTargets
     },
     computed: {
 
