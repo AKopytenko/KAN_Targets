@@ -29,7 +29,7 @@
                 Список задач пуст...
             </div>
 
-            <ImportTargets />
+            <ImportTargets v-if="getTargets" />
 
         </div>
 
@@ -58,6 +58,9 @@
 
 <script>
 
+import 'jquery'
+import 'bootstrap'
+
 import { mapGetters, mapActions } from 'vuex'
 
 import Target           from './Target'
@@ -81,29 +84,33 @@ export default {
     },
     computed: {
 
-        ...mapGetters(['getTargets'])
+        ...mapGetters([
+
+            'getTargets'
+        ])
     },
     methods: {
 
-        ...mapActions(['readTargets', 'deleteTarget']),
+        ...mapActions([
+
+            'readTargets', 
+            'deleteTarget'
+        ]),
 
         setDeleteTargetID(id) {
 
             this.deleteTargetID = id
-            console.log(this.deleteTargetID)
         }
     },
     mounted() {
 
         this.readTargets()
-    },
-    watch: {
-
-
     }
 }
 </script>
 
 <style lang="scss">
+@import '~bootstrap/dist/css/bootstrap.min.css';
+@import '~@fortawesome/fontawesome-free/css/all.min.css';
 @import '@/assets/styles/layout.scss';
 </style>

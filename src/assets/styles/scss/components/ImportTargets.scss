@@ -1,4 +1,12 @@
 .ktg-import {
 
-    border-top: 1px solid #ddd
+    border-top: 1px solid #ddd;
+
+    &__modalFormLabel {
+
+        &:after {
+
+            content: 'Обзор' !important;
+        }
+    }
 }

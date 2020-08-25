@@ -2,6 +2,7 @@
     <div class="pt-4 ktg-import">
         <h3 class="ktg-import__header">Импорт/экспорт</h3>
         <div class="ktg-import__descr">Загрузить/cкачать задачи для переноса между устройствами.</div>
+
         <div class="my-3 ktg-import__buttons">
             <button 
                 type="button"
@@ -33,7 +34,7 @@
                     </div>
                     <form class="ktg-import__modalForm" action="/" method="post" id="importTargetsForm" @submit.prevent="uploadTargets($event)">
                         <div class="modal-body ktg-import__modalBody">
-                            <div class="ktg-import__modalResult" v-if="importTargetsMsg">
+                            <div class="ktg-import__result" v-if="importTargetsMsg">
                                 <div 
                                     class="alert"
                                     :class="{
@@ -44,21 +45,42 @@
                                     {{ importTargetsMsg.text }}
                                 </div>
                             </div>
+                            <div class="ktg-import__error" v-if="formErrors.length">
+                                <div class="alert alert-danger">
+                                    <div v-for="error in formErrors" :key="error">
+                                        {{ error }}
+                                    </div>
+                                </div>
+                            </div>
                             <div class="form-group ktg-import__modalFormGroup">
-                                Способ загрузки:
-                                <ul class="ktg-import__modalFormLabel">
+                                <label for="importTargetsMethod"> Способ загрузки:</label>
+                                <select 
+                                    id="importTargetsMethod" 
+                                    class="custom-select ktg-import__modalFormInput"
+                                    :class="{ 'is-invalid': 'importTargetsMethod' in invalidFields }" 
+                                    @change="checkValid($event)"
+                                >
+                                    <option value="" selected disabled>...</option>
+                                    <option value="push">Добавить</option>
+                                    <option value="rewrite">Перезаписать</option>
+                                </select>
+                                <ul class="mt-2 mb-4 ktg-import__modalFormLabel">
                                     <li><strong>Добавить:</strong> задачи из файла будут добавлены к уже существующим;</li>
                                     <li><strong>Перезаписать:</strong> существующие задачи будут УДАЛЕНЫ, после загрузки останутся только задачи из файла.</li>
                                 </ul>
-                                <select id="importTargetsType" class="custom-select ktg-import__modalFormInput">
-                                    <option value="" selected disabled>...</option>
-                                    <option value="push" disabled>Добавить</option>
-                                    <option value="rewrite">Перезаписать</option>
-                                </select>
                             </div>
                             <div class="form-group ktg-import__modalFormGroup">
-                                <label for="importTargetsFile" class="ktg-import__modalFormLabel">Файл задач:</label>
-                                <input type="file" id="importTargetsFile" class="form-control-file ktg-import__modalFormInput" accept=".txt">
+                                <div class="custom-file" :class="{ 'is-invalid': 'importTargetsFile' in invalidFields }" >
+                                    <input
+                                        type="file" 
+                                        id="importTargetsFile" 
+                                        class="custom-file-input ktg-import__modalFormInput" 
+                                        accept=".txt"
+                                        :class="{ 'is-invalid': 'importTargetsFile' in invalidFields }" 
+                                        @change="checkValid($event)"
+                                    >
+                                    <label for="importTargetsFile" class="custom-file-label ktg-import__modalFormLabel">Файл задач</label>
+                                </div>
                             </div>
                         </div>
                         <div class="modal-footer ktg-import__modalFooter">
@@ -73,6 +95,7 @@
 </template>
 
 <script>
+import $ from 'jquery'
 import { mapGetters, mapMutations } from 'vuex'
 
 export default {
@@ -83,6 +106,8 @@ export default {
 
         return {
 
+            invalidFields: {},
+            formErrors: [],
             importTargetsMsg: null
         }
     },
@@ -129,76 +154,114 @@ export default {
 
             let data = {}
 
-            if(fields.importTargetsType.value) {
+            this.invalidFields = {}
+            this.formErrors = []
 
-                data.type = fields.importTargetsType.value
+            if(fields.importTargetsMethod.value) {
+                data.method = fields.importTargetsMethod.value
+            } else {
+                this.invalidFields.importTargetsMethod = true
+                this.formErrors.push('Не выбран способ загрузки')
             }
 
             if(fields.importTargetsFile.value) {
-
-                if(fields.importTargetsFile.files[0].type == 'text/plain') {
-
-                    data.file = fields.importTargetsFile.files[0]
-                }
-            }
-
-            if(data.type && data.file) {
-
-                console.log('Поля заполнены')
                 
-                const reader = new FileReader()
+                let file     = fields.importTargetsFile.files[0],
+                    fileType = file.type,
+                    fileExt  = file.name.split('.')[1]
 
-                reader.readAsText(data.file)
-
-                reader.onload = function(event) {
-
-                    try {
-
-                        const fileContent = JSON.parse(event.target.result)
-
-                        let targets = []
-
-                        for(let target of fileContent) {
-
-                            if(
-                                'name'      in target && 
-                                'descr'     in target && 
-                                'priority'  in target && 
-                                'created'   in target && 
-                                'id'        in target
-                            ) {
-
-                                targets.push({
-
-                                    name: target.name,
-                                    descr: target.descr,
-                                    priority: target.priority,
-                                    created: target.created,
-                                    id: target.id
-                                })
-
-                            } else {
-
-                                self.importTargetsMsg = { success: false, text: 'ОШИБКА: Неверный формат файла!' }
-                                return false
-                            }
-                        }
-                    } catch {
-
-                        self.importTargetsMsg = { success: false, text: 'ОШИБКА: Неверный формат файла!' }
-                        return false
-                    }
-
-                    self.setTargets(event.target.result)
-
-                    self.importTargetsMsg = { success: true, text: 'Задачи успешно загружены' }
+                if( fileType == 'text/plain' || fileExt == 'txt' ) {
+                    data.file = fields.importTargetsFile.files[0]
+                } else {
+                    this.invalidFields.importTargetsFile = true
+                    this.formErrors.push('Неверный формат файла')
                 }
             } else {
-
-                self.importTargetsMsg = { success: false, text: 'Не заполнено обязательное поле' }
-                return false
+                this.invalidFields.importTargetsFile = true
+                this.formErrors.push('Не выбран файл с задачами')
             }
+
+            {{ this.formErrors }}
+
+            if(this.formErrors.length == 0) {
+
+                const reader = new FileReader()
+
+                switch( data.method ) {
+
+                    case 'rewrite':
+                        
+                        reader.readAsText(data.file)
+
+                        reader.onload = function(event) {
+
+                            try {
+
+                                const fileContent = JSON.parse(event.target.result)
+
+                                let targets = []
+
+                                for(let target of fileContent) {
+
+                                    if(
+                                        'name'      in target && 
+                                        'descr'     in target && 
+                                        'priority'  in target && 
+                                        'created'   in target && 
+                                        'id'        in target
+                                    ) {
+
+                                        targets.push({
+
+                                            name: target.name,
+                                            descr: target.descr,
+                                            priority: target.priority,
+                                            created: target.created,
+                                            id: target.id
+                                        })
+
+                                    } else {
+
+                                        self.importTargetsMsg = { success: false, text: 'Неверный формат файла!' }
+                                        return false
+                                    }
+                                }
+                            } catch {
+
+                                self.importTargetsMsg = { success: false, text: 'Неверный формат файла!' }
+                                return false
+                            }
+
+                            self.setTargets(event.target.result)
+
+                            self.importTargetsMsg = { success: true, text: 'Задачи успешно загружены' }
+                        }
+
+                        break
+
+                    case 'push':
+
+                        break
+                }
+
+            }
+        },
+
+        checkValid($event) {
+
+            $event.target.classList.remove('is-invalid')
         }
+    },
+
+    mounted() {
+
+        const self = this
+
+        $('#importTargetsModal').on('hidden.bs.modal', function() {
+            self.formErrors = []
+            self.invalidFields = {}
+            document.querySelector('#importTargetsForm').reset()
+        })
     }
 }
 </script>
