@@ -1,3 +1,14 @@
 @import './scss/_variables.scss';
 @import './scss/components/Targets.scss';
 @import './scss/components/CreateTarget.scss';
+
+.custom-file-input {
+
+    & ~ .custom-file-label {
+ 
+        &:after {
+
+            content: 'Обзор'
+        }
+    }
+}
