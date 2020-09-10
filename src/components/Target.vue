@@ -83,6 +83,8 @@
 
 <script>
 
+import $ from 'jquery'
+
 import { mapActions, mapGetters } from 'vuex'
 
 export default {
@@ -138,6 +140,16 @@ export default {
 
             this.updateTarget(formData)
         }
+    },
+
+    mounted() {
+
+        const self = this
+
+        $('.target__content').on('hide.bs.collapse', function () {
+            
+            self.showUpdateForm(false)
+        })
     },
 
     watch: {
