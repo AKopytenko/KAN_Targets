@@ -18,7 +18,7 @@
                 data-toggle="modal" 
                 data-target="#importTargetsModal" 
                 aria-hidden="true"
-                @clock.prevent="importTargetsMsg = null"
+                @click.prevent="importTargetsMsg = null"
             >
                 Загрузить
             </button>
@@ -260,6 +260,7 @@ export default {
         $('#importTargetsModal').on('hidden.bs.modal', function() {
             self.formErrors = []
             self.invalidFields = {}
+            self.importTargetsMsg = null
             document.querySelector('#importTargetsForm').reset()
         })
     }
