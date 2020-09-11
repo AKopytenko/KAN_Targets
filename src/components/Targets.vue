@@ -14,9 +14,14 @@
                 </div>
             </div>
 
-            <div class="ktg-targets__list my-4" v-if="getTargets.length">
+            <div class="ktg-targets__search">
+                <input class="form-control ktg-targets__searchInput" type="text" placeholder="Поиск задач..." id="searchTargets" @keyup="filterTargets($event)">
+                <div class="alert alert-danger mt-4 ktg-targets__searchError" v-if="filteredTargetsEmpty">{{ filteredTargetsEmpty }}</div>
+            </div>
+
+            <div class="ktg-targets__list my-4" v-if="targets.length">
                 <div class="accordion ktg-targets__accordion" id="targetsList">
-                    <div class="card ktg-target__card " v-for="target in getTargets" :key="target.created">
+                    <div class="card ktg-target__card " v-for="target in targets" :key="target.created">
                         <Target 
                             :target="target"
                             @delete-target-id="setDeleteTargetID($event)" 
@@ -25,11 +30,11 @@
                 </div>
             </div>
 
-            <div class="ktg-targets__empty my-4" v-if="!getTargets.length">
+            <div class="ktg-targets__empty my-4" v-if="!targets.length">
                 Список задач пуст...
             </div>
 
-            <ImportTargets v-if="getTargets" />
+            <ImportTargets v-if="targets" />
 
         </div>
 
@@ -73,7 +78,10 @@ export default {
 
         return {
             
-            deleteTargetID: null
+            deleteTargetID: null,
+
+            filteredTargets: [],
+            filteredTargetsEmpty: null
         }
     },
     components: {
@@ -87,7 +95,16 @@ export default {
         ...mapGetters([
 
             'getTargets'
-        ])
+        ]),
+
+        targets() {
+
+            if(this.filteredTargets.length) {
+                return this.filteredTargets
+            } else {
+                return this.getTargets
+            }
+        }
     },
     methods: {
 
@@ -96,6 +113,40 @@ export default {
             'readTargets', 
             'deleteTarget'
         ]),
+
+        filterTargets(input) {
+
+            const filterData = input.target.value.toUpperCase()
+
+            this.filteredTargets = []
+            this.filteredTargetsEmpty = null
+
+            if(filterData.length > 2) {
+
+                if(this.getTargets.length) {
+
+                    for(let target of this.getTargets) {
+
+                        const reg = new RegExp(filterData, 'g')
+
+                        if( reg.test(target.name.toUpperCase()) || reg.test(target.descr.toUpperCase()) ) {
+                            
+                            this.filteredTargets.push(target)
+                        }
+                    }
+
+                    if(this.filteredTargets.length == 0) {
+
+                        this.filteredTargets = []
+                        this.filteredTargetsEmpty = 'Нет задач, содержащих указанные данные.'
+                    }
+                }
+            } else {
+
+                this.filteredTargets = []
+                this.filteredTargetsEmpty = null
+            }
+        },
 
         setDeleteTargetID(id) {
 
