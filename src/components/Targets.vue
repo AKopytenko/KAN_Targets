@@ -21,7 +21,7 @@
 
             <div class="ktg-targets__list my-4" v-if="targets.length">
                 <div class="accordion ktg-targets__accordion" id="targetsList">
-                    <div class="card ktg-target__card " v-for="target in targets" :key="target.created">
+                    <div class="card ktg-target__card " v-for="target in targets" :key="target.id">
                         <Target 
                             :target="target"
                             @delete-target-id="setDeleteTargetID($event)" 

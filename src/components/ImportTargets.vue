@@ -1,5 +1,6 @@
 <template>
     <div class="pt-4 ktg-import">
+
         <h3 class="ktg-import__header">Импорт/экспорт</h3>
         <div class="ktg-import__descr">Загрузить/cкачать задачи для переноса между устройствами.</div>
 
@@ -187,6 +188,8 @@ export default {
 
                 const reader = new FileReader()
 
+                let targets = []
+
                 switch( data.method ) {
 
                     case 'rewrite':
@@ -199,7 +202,6 @@ export default {
 
                                 const fileContent = JSON.parse(event.target.result)
 
-                                let targets = []
 
                                 for(let target of fileContent) {
 
@@ -219,11 +221,6 @@ export default {
                                             created: target.created,
                                             id: target.id
                                         })
-
-                                    } else {
-
-                                        self.importTargetsMsg = { success: false, text: 'Неверный формат файла!' }
-                                        return false
                                     }
                                 }
                             } catch {
@@ -232,7 +229,7 @@ export default {
                                 return false
                             }
 
-                            self.setTargets(event.target.result)
+                            self.setTargets(targets)
 
                             self.importTargetsMsg = { success: true, text: 'Задачи успешно загружены' }
                         }
@@ -240,6 +237,57 @@ export default {
                         break
 
                     case 'push':
+
+                        reader.readAsText(data.file)
+
+                        reader.onload = function(event) {
+
+                            try {
+
+                                const fileContent = JSON.parse(event.target.result)
+
+                                let targetID = 0
+
+                                if(self.getTargets.length) {
+
+                                    const allIDs = self.getTargets.map( target => target.id )
+
+                                    targetID = Math.max.apply(null, allIDs) + 1
+                                }
+
+                                for(let target of fileContent) {
+
+                                    if(
+                                        'name'      in target && 
+                                        'descr'     in target && 
+                                        'priority'  in target && 
+                                        'created'   in target
+                                    ) {
+
+                                        targets.push({
+
+                                            name: target.name,
+                                            descr: target.descr,
+                                            priority: target.priority,
+                                            created: target.created,
+                                            id: targetID
+                                        })
+
+                                        targetID++
+                                    }
+                                }
+                            } catch {
+
+                                self.importTargetsMsg = { success: false, text: 'Неверный формат файла!' }
+                                return false
+                            }
+
+                            targets = [...self.getTargets, ...targets]
+
+                            self.setTargets(targets)
+
+                            self.importTargetsMsg = { success: true, text: 'Задачи успешно загружены' }
+                        }
 
                         break
                 }

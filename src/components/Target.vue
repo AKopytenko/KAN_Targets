@@ -7,9 +7,9 @@
                     : target.priority }" 
                     type="button" 
                     data-toggle="collapse" 
-                    :data-target="'#target-' + target.created" 
+                    :data-target="'#target-' + target.id" 
                     aria-expanded="false" 
-                    :aria-controls="'target-' + target.created" 
+                    :aria-controls="'target-' + target.id" 
                     v-if="!updateForm"
                 >
                         {{ target.name }}
@@ -25,7 +25,7 @@
                     &times;
                 </a>
             </div>
-            <div :id="'target-' + target.created" class="collapse target__content" aria-labelledby="headingOne" data-parent="#targetsList">
+            <div :id="'target-' + target.id" class="collapse target__content" aria-labelledby="headingOne" data-parent="#targetsList">
                 <div class="card-body target__body">
                     <div class="target__status" v-if="updateFormMsg">
                         <div 
