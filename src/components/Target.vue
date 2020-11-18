@@ -72,7 +72,12 @@
                             v-if="updateForm"
                         >
 
-                        <input type="hidden" id="targetID" :value="target.id">
+                        <input 
+                            type="hidden" 
+                            id="targetID" 
+                            :value="target.id"
+                            v-if="updateForm"
+                        >
 
                     </div>
                 </div>
