@@ -15,7 +15,12 @@
             </div>
 
             <div class="ktg-targets__search">
-                <input class="form-control ktg-targets__searchInput" type="text" placeholder="Поиск задач..." id="searchTargets" @keyup="filterTargets($event)">
+
+                <div class="inputWrapper">
+                    <input class="form-control ktg-targets__searchInput inputWrapper__field" type="text" placeholder="Поиск задач..." id="searchTargets" @keyup="filterTargets($event.target.value.toUpperCase())">
+                    <i class="fas fa-times-circle inputWrapper__icon" v-if="searchTargetsIcon" @click.prevent="clearSearchInput"></i>
+                </div>
+                
                 <div class="alert alert-danger mt-4 ktg-targets__searchError" v-if="filteredTargetsEmpty">{{ filteredTargetsEmpty }}</div>
             </div>
 
@@ -81,7 +86,9 @@ export default {
             deleteTargetID: null,
 
             filteredTargets: [],
-            filteredTargetsEmpty: null
+            filteredTargetsEmpty: null,
+
+            searchTargetsIcon: false
         }
     },
     components: {
@@ -114,20 +121,27 @@ export default {
             'deleteTarget'
         ]),
 
-        filterTargets(input) {
+        clearSearchInput() {
 
-            const filterData = input.target.value.toUpperCase()
+            document.querySelector('#searchTargets').value = ''
+            this.searchTargetsIcon = false
+            this.filterTargets()
+        },
+
+        filterTargets(input) {
 
             this.filteredTargets = []
             this.filteredTargetsEmpty = null
 
-            if(filterData.length > 2) {
+            if(input && input.length > 2) {
+
+                this.searchTargetsIcon = true
 
                 if(this.getTargets.length) {
 
                     for(let target of this.getTargets) {
 
-                        const reg = new RegExp(filterData, 'g')
+                        const reg = new RegExp(input, 'g')
 
                         if( reg.test(target.name.toUpperCase()) || reg.test(target.descr.toUpperCase()) ) {
                             
@@ -145,6 +159,7 @@ export default {
 
                 this.filteredTargets = []
                 this.filteredTargetsEmpty = null
+                this.searchTargetsIcon = false
             }
         },
 

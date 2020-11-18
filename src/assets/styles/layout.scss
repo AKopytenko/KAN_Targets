@@ -1,6 +1,7 @@
 @import './scss/_variables.scss';
 @import './scss/components/Targets.scss';
 @import './scss/components/CreateTarget.scss';
+@import '~@fortawesome/fontawesome-free/css/all.min.css';
 
 .custom-file-input {
 
@@ -10,5 +11,20 @@
 
             content: 'Обзор'
         }
+    }
+}
+
+.inputWrapper {
+
+    position: relative;
+
+    &__icon {
+
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        margin-top: -8px;
+        opacity: .7;
+        cursor: pointer;
     }
 }
