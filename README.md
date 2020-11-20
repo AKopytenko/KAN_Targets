@@ -1,24 +1,16 @@
-# kan-targets
+# KAN-Targets
 
-## Project setup
+## Установка
 ```
-npm install
+npm i
 ```
 
-### Compiles and hot-reloads for development
+### Запуск на dev-сервере
 ```
 npm run serve
 ```
 
-### Compiles and minifies for production
+### Сборка production
 ```
 npm run build
 ```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
