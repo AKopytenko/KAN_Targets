@@ -1,29 +1,34 @@
 <template>
-    <div class="pt-4 ktg-import">
+    <div class="ktg-card ktg-card_inline ktg-import">
 
-        <h3 class="ktg-import__header">Импорт/экспорт</h3>
-        <div class="ktg-import__descr">Загрузить/cкачать задачи для переноса между устройствами.</div>
+        <div class="ktg-card__body">
 
-        <div class="my-3 ktg-import__buttons">
-            <button 
-                type="button"
-                class="btn btn-primary mr-2 ktg-import__download"
-                :disabled="!getTargets.length"
-                @click.prevent="downloadTargets()"
-            >
-                Скачать
-            </button>
-            <button 
-                type="button"
-                class="btn btn-primary mr-2 ktg-import__upload"
-                data-toggle="modal" 
-                data-target="#importTargetsModal" 
-                aria-hidden="true"
-                @click.prevent="importTargetsMsg = null"
-            >
-                Загрузить
-            </button>
+            <h3 class="ktg-import__header">Импорт/экспорт</h3>
+            <div class="ktg-import__descr">Загрузить/cкачать задачи для переноса между устройствами.</div>
+
+            <div class="mt-3 ktg-import__buttons">
+                <button 
+                    type="button"
+                    class="btn btn-primary mr-2 ktg-import__download"
+                    :disabled="!getTargets.length"
+                    @click.prevent="downloadTargets()"
+                >
+                    Скачать
+                </button>
+                <button 
+                    type="button"
+                    class="btn btn-primary mr-2 ktg-import__upload"
+                    data-toggle="modal" 
+                    data-target="#importTargetsModal" 
+                    aria-hidden="true"
+                    @click.prevent="importTargetsMsg = null"
+                >
+                    Загрузить
+                </button>
+            </div>
+
         </div>
+
         <div class="modal fade ktg-import__modal" id="importTargetsModal" tabindex="-1" aria-labelledby="importTargetsModalLabel" aria-hidden="true">
             <div class="modal-dialog ktg-import__modalDialog">
                 <div class="modal-content ktg-import__modalContent">

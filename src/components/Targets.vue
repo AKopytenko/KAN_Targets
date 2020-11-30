@@ -26,12 +26,13 @@
 
             <div class="ktg-targets__list my-4" v-if="targets.length">
                 <div class="accordion ktg-targets__accordion" id="targetsList">
-                    <div class="card ktg-target__card " v-for="target in targets" :key="target.id">
+                    <template v-for="target in targets">
                         <Target 
                             :target="target"
+                            :key="target.id"
                             @delete-target-id="setDeleteTargetID($event)" 
                         />
-                    </div>
+                    </template>
                 </div>
             </div>
 

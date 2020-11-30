@@ -1,7 +1,7 @@
 <template>
-    <div class="target">
-        <form action="/" @submit.prevent="sendUpdateTarget($event)">
-            <div class="card-header target__header" id="headingOne">
+    <div class="ktg-card target">
+        <form action="/" @submit.prevent="sendUpdateTarget($event)" class="ktg-card__body target__body">
+            <div class="target__header" id="headingOne">
                 <h3 class="target__name collapsed" 
                     :class="{ 'target__name_priority' 
                     : target.priority }" 
@@ -26,7 +26,7 @@
                 </a>
             </div>
             <div :id="'target-' + target.id" class="collapse target__content" aria-labelledby="headingOne" data-parent="#targetsList">
-                <div class="card-body target__body">
+                <div class="target__body">
                     <div class="target__status" v-if="updateFormMsg">
                         <div 
                             class="alert" 
