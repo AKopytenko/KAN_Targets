@@ -1,7 +1,7 @@
 <template>
     <div class="ktg-card ktg-card_inline ktg-import">
 
-        <div class="ktg-card__body">
+        <div class="ktg-card__body ktg-import__body">
 
             <h3 class="ktg-import__header">Импорт/экспорт</h3>
             <div class="ktg-import__descr">Загрузить/cкачать задачи для переноса между устройствами.</div>

@@ -1,8 +1,8 @@
 <template>
     <div class="ktg-card target">
-        <form action="/" @submit.prevent="sendUpdateTarget($event)" class="ktg-card__body target__body">
+        <form action="/" @submit.prevent="sendUpdateTarget($event)" class="ktg-card__body target__form">
             <div class="target__header" id="headingOne">
-                <h3 class="target__name collapsed" 
+                <h3 class="collapsed p-4 target__name" 
                     :class="{ 'target__name_priority' 
                     : target.priority }" 
                     type="button" 
@@ -17,7 +17,7 @@
                 <input v-model="target.name" type="text" id="targetUpdateName" class="form-control target__nameUpdate" v-if="updateForm">
                 <a 
                     href="#" 
-                    class="target__delete ml-3" 
+                    class="target__delete px-4" 
                     data-toggle="modal" 
                     data-target="#deleteTargetModal"
                     @click.prevent="$emit('delete-target-id', target.id)"
