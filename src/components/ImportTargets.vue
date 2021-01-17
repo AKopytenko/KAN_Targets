@@ -7,6 +7,7 @@
             <div class="ktg-import__descr">Загрузить/cкачать задачи для переноса между устройствами.</div>
 
             <div class="mt-3 ktg-import__buttons">
+
                 <button 
                     type="button"
                     class="btn btn-primary mr-2 ktg-import__download"
@@ -15,6 +16,7 @@
                 >
                     Скачать
                 </button>
+
                 <button 
                     type="button"
                     class="btn btn-primary mr-2 ktg-import__upload"
@@ -25,6 +27,7 @@
                 >
                     Загрузить
                 </button>
+
             </div>
 
         </div>
@@ -58,11 +61,11 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="form-group ktg-import__modalFormGroup">
-                                <label for="importTargetsMethod"> Способ загрузки:</label>
+                            <div class="form-group ktg-import__formGroup">
+                                <label for="importTargetsMethod ktg-import__formLabel"> Способ загрузки:</label>
                                 <select 
                                     id="importTargetsMethod" 
-                                    class="custom-select ktg-import__modalFormInput"
+                                    class="custom-select ktg-import__formInput"
                                     :class="{ 'is-invalid': 'importTargetsMethod' in invalidFields }" 
                                     @change="checkValid($event)"
                                 >
@@ -70,22 +73,28 @@
                                     <option value="push">Добавить</option>
                                     <option value="rewrite">Перезаписать</option>
                                 </select>
-                                <ul class="mt-2 mb-4 ktg-import__modalFormLabel">
-                                    <li><strong>Добавить:</strong> задачи из файла будут добавлены к уже существующим;</li>
-                                    <li><strong>Перезаписать:</strong> существующие задачи будут УДАЛЕНЫ, после загрузки останутся только задачи из файла.</li>
-                                </ul>
+                                <div class="mt-3 mb-4 ktg-import__formDescr">
+                                    <div class="my-2 ktg-import__formDescrItem">
+                                        <strong>Добавить</strong> 
+                                        Задачи из файла будут добавлены к уже существующим.
+                                    </div>
+                                    <div class="my-2 ktg-import__formDescrItem">
+                                        <strong>Перезаписать</strong> 
+                                        Существующие задачи будут УДАЛЕНЫ, после загрузки останутся только задачи из файла.
+                                    </div>
+                                </div>
                             </div>
-                            <div class="form-group ktg-import__modalFormGroup">
+                            <div class="form-group ktg-import__formGroup">
                                 <div class="custom-file" :class="{ 'is-invalid': 'importTargetsFile' in invalidFields }" >
                                     <input
                                         type="file" 
                                         id="importTargetsFile" 
-                                        class="custom-file-input ktg-import__modalFormInput" 
+                                        class="custom-file-input ktg-import__formInput" 
                                         accept=".txt"
                                         :class="{ 'is-invalid': 'importTargetsFile' in invalidFields }" 
                                         @change="checkValid($event)"
                                     >
-                                    <label for="importTargetsFile" class="custom-file-label ktg-import__modalFormLabel">Файл задач</label>
+                                    <label for="importTargetsFile" class="custom-file-label ktg-import__formLabel">Файл задач</label>
                                 </div>
                             </div>
                         </div>

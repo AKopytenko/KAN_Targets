@@ -4,4 +4,21 @@
 
         padding: 1.5rem;
     }
+
+    &__form {
+
+        &Descr { 
+
+            &Item {
+
+                font-size: 14px;
+                color: #777;
+                
+                strong {
+
+                    display: block;
+                }
+            }
+        }
+    }
 }

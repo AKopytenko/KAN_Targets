@@ -14,7 +14,7 @@
                 >
                         {{ target.name }}
                 </h3>
-                <input v-model="target.name" type="text" id="targetUpdateName" class="form-control target__nameUpdate" v-if="updateForm">
+                <input v-model="target.name" type="text" id="targetUpdateName" class="m-4 form-control target__nameUpdate" v-if="updateForm">
                 <a 
                     href="#" 
                     class="target__delete px-4" 
