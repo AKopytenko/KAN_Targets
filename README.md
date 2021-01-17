@@ -20,8 +20,10 @@ npm run serve
 npm run build
 ```  
 
-Desktop
-![](https://github.com/AKopytenko/KAN-Targets/blob/master/preview/kantargets-preview-desktop.jpg)  
+### Preview  
 
-Mobile
-![](https://github.com/AKopytenko/KAN-Targets/blob/master/preview/kantargets-preview-mobile.jpg)  
+#### Desktop  
+![](https://github.com/AKopytenko/KAN-Targets/blob/master/preview/kantargets-preview-desktop.jpg)
+
+#### Mobile  
+![](https://github.com/AKopytenko/KAN-Targets/blob/master/preview/kantargets-preview-mobile.jpg)
