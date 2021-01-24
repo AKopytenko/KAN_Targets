@@ -216,13 +216,13 @@ export default {
 
                                 const fileContent = JSON.parse(event.target.result)
 
-
                                 for(let target of fileContent) {
 
                                     if(
                                         'name'      in target && 
                                         'descr'     in target && 
                                         'priority'  in target && 
+                                        'completed' in target &&
                                         'created'   in target && 
                                         'id'        in target
                                     ) {
@@ -232,6 +232,7 @@ export default {
                                             name: target.name,
                                             descr: target.descr,
                                             priority: target.priority,
+                                            completed: target.completed,
                                             created: target.created,
                                             id: target.id
                                         })
@@ -275,6 +276,7 @@ export default {
                                         'name'      in target && 
                                         'descr'     in target && 
                                         'priority'  in target && 
+                                        'completed' in target &&
                                         'created'   in target
                                     ) {
 
@@ -283,6 +285,7 @@ export default {
                                             name: target.name,
                                             descr: target.descr,
                                             priority: target.priority,
+                                            completed: target.completed,
                                             created: target.created,
                                             id: targetID
                                         })

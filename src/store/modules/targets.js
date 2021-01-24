@@ -78,8 +78,9 @@ export default {
 
                 state.targets.map( target => {
                     if(target.id == targetData.id) {
-                        target.name = targetData.name
-                        target.descr = targetData.descr
+                        target.name      = targetData.name
+                        target.descr     = targetData.descr
+                        target.completed = targetData.completed
                     }
                 })
                 

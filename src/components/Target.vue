@@ -1,10 +1,21 @@
 <template>
-    <div class="ktg-card target">
-        <form action="/" @submit.prevent="sendUpdateTarget($event)" class="ktg-card__body target__form">
+
+    <div 
+        class="ktg-card target"
+        :class="{ 'target__completed' : target.completed }"
+    >
+
+        <form action="/" @submit.prevent="sendUpdateTarget($event.target.elements)" class="ktg-card__body target__form">
+
             <div class="target__header" id="headingOne">
+
+                <i 
+                    class="far fa-check-square ml-4 target__status"
+                    :class="{ 'fas' : target.completed }"
+                ></i>
+
                 <h3 class="collapsed p-4 target__name" 
-                    :class="{ 'target__name_priority' 
-                    : target.priority }" 
+                    :class="{ 'target__name_priority' : target.priority }" 
                     type="button" 
                     data-toggle="collapse" 
                     :data-target="'#target-' + target.id" 
@@ -14,7 +25,9 @@
                 >
                         {{ target.name }}
                 </h3>
+
                 <input v-model="target.name" type="text" id="targetUpdateName" class="m-4 form-control target__nameUpdate" v-if="updateForm">
+                
                 <a 
                     href="#" 
                     class="target__delete px-4" 
@@ -24,12 +37,16 @@
                 >
                     &times;
                 </a>
+
             </div>
+
             <div :id="'target-' + target.id" class="collapse target__content" aria-labelledby="headingOne" data-parent="#targetsList">
+
                 <div class="target__body">
-                    <div class="target__status" v-if="updateFormMsg">
+
+                    <template v-if="updateFormMsg">
                         <div 
-                            class="alert" 
+                            class="target__message alert" 
                             :class="{ 
                                 'alert-success': updateFormMsg.success, 
                                 'alert-danger': !updateFormMsg.success 
@@ -37,16 +54,24 @@
                             v-if="updateFormMsg.success"
                         >
                             {{ updateFormMsg.text }}
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
+                            <button type="button" class="close target__messageClose" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true" class="target__messageCloseIcon">&times;</span>
                             </button>
                         </div>
-                    </div>
-                    <div class="target__descr">
+                    </template>
+
+                    <div class="form-group target__descr">
                         <span class="target__descrText" v-if="!updateForm" v-html="target.descr.split('\n').join('<br>')"></span>
                         <textarea v-model="target.descr" id="targetUpdateDescr" class="form-control target__descrUpdate" v-if="updateForm" rows="6"></textarea>
                     </div>
+
+                    <div class="form-group form-check target__state" v-if="updateForm">
+                        <input type="checkbox" :checked="target.completed" id="targetUpdateState" class="form-check-input target__stateUpdate">
+                        <label class="form-check-label" for="targetUpdateState">Задача завершена</label>
+                    </div>
+
                     <div class="target__footer mt-4 pt-3">
+
                         <div class="target__created">Добавлена: {{ new Date(target.created * 1000).toLocaleString() }}</div>
                         
                         <input 
@@ -80,15 +105,20 @@
                         >
 
                     </div>
+
                 </div>
+
             </div>
+
         </form>
+
     </div>
+
 </template>
 
 <script>
 
-import $ from 'jquery'
+import $ from 'jquery/dist/jquery.slim'
 
 import { mapActions, mapGetters } from 'vuex'
 
@@ -98,7 +128,11 @@ export default {
 
     props: {
 
-        target: Object
+        target: {
+            
+            required: true,
+            type: Object
+        }
     },
 
     data() {
@@ -132,15 +166,14 @@ export default {
             this.updateFormMsg = null
         },
 
-        sendUpdateTarget($event) {
-
-            const formFields = $event.target.elements
+        sendUpdateTarget(fields) {
 
             const formData = {
 
-                id: formFields.targetID.value,
-                name: formFields.targetUpdateName.value,
-                descr: formFields.targetUpdateDescr.value
+                id:         fields.targetID.value,
+                name:       fields.targetUpdateName.value,
+                descr:      fields.targetUpdateDescr.value,
+                completed:  fields.targetUpdateState.value
             }
 
             this.updateTarget(formData)

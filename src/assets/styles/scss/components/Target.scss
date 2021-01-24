@@ -6,6 +6,17 @@
         align-items: center;
         justify-content: space-between;
     }
+    
+    &__status {
+
+        font-size: 1.5rem;
+        color: #bbb;
+
+        &Completed {
+
+            color: #0062cc;
+        }
+    }
 
     &__content {
 
@@ -35,6 +46,15 @@
 
         &_priority {
             color:#ff0000;
+        }
+    }
+
+    &__completed & {
+
+        &__name,
+        &__status {
+
+            color:  #0062cc
         }
     }
 
