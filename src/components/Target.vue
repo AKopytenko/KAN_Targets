@@ -168,15 +168,15 @@ export default {
 
         sendUpdateTarget(fields) {
 
-            const formData = {
+            const data = {
 
                 id:         fields.targetID.value,
                 name:       fields.targetUpdateName.value,
                 descr:      fields.targetUpdateDescr.value,
-                completed:  fields.targetUpdateState.value
+                completed:  fields.targetUpdateState.checked
             }
 
-            this.updateTarget(formData)
+            this.updateTarget(data)
         }
     },
 
