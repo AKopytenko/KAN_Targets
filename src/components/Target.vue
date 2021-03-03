@@ -118,7 +118,7 @@
 
 <script>
 
-import $ from 'jquery/dist/jquery.slim'
+import $ from 'jquery'
 
 import { mapActions, mapGetters } from 'vuex'
 
