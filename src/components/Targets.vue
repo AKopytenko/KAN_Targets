@@ -17,7 +17,13 @@
             <div class="ktg-targets__search">
 
                 <div class="inputWrapper">
-                    <input class="form-control ktg-targets__searchInput inputWrapper__field" type="text" placeholder="Поиск задач..." id="searchTargets" @keyup="filterTargets($event.target.value.toUpperCase())">
+                    <input 
+                        class="form-control ktg-targets__searchInput inputWrapper__field" 
+                        type="text" 
+                        placeholder="Поиск задач..." 
+                        id="searchTargets" 
+                        v-model="inputSearch"
+                    >
                     <i class="fas fa-times-circle inputWrapper__icon" v-if="searchTargetsIcon" @click.prevent="clearSearchInput"></i>
                 </div>
                 
@@ -88,7 +94,8 @@ export default {
 
             filteredTargets: [],
             filteredTargetsEmpty: null,
-
+            
+            inputSearch: '',
             searchTargetsIcon: false
         }
     },
@@ -142,7 +149,7 @@ export default {
 
                     for(let target of this.getTargets) {
 
-                        const reg = new RegExp(input, 'g')
+                        const reg = new RegExp(input.toUpperCase(), 'g')
 
                         if( reg.test(target.name.toUpperCase()) || reg.test(target.descr.toUpperCase()) ) {
                             
@@ -172,6 +179,13 @@ export default {
     mounted() {
 
         this.readTargets()
+    },
+    watch: {
+
+        inputSearch(text) {
+
+            this.filterTargets(text)
+        }
     }
 }
 </script>
