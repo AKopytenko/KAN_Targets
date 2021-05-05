@@ -17,9 +17,9 @@
                 <h3 class="collapsed p-4 target__name" 
                     :class="{ 'target__name_priority' : target.priority }" 
                     type="button" 
-                    data-toggle="collapse" 
-                    :data-target="'#target-' + target.id" 
+                    data-bs-toggle="collapse"
                     aria-expanded="false" 
+                    :data-bs-target="'#target-' + target.id" 
                     :aria-controls="'target-' + target.id" 
                     v-if="!updateForm"
                 >
@@ -30,9 +30,9 @@
                 
                 <a 
                     href="#" 
-                    class="target__delete px-4" 
-                    data-toggle="modal" 
-                    data-target="#deleteTargetModal"
+                    class="target__delete" 
+                    data-bs-toggle="modal" 
+                    data-bs-target="#deleteTargetModal"
                     @click.prevent="$emit('delete-target-id', target.id)"
                 >
                     &times;
@@ -40,13 +40,13 @@
 
             </div>
 
-            <div :id="'target-' + target.id" class="collapse target__content" aria-labelledby="headingOne" data-parent="#targetsList">
+            <div :id="'target-' + target.id" class="collapse target__content" data-bs-parent="#targetsList">
 
                 <div class="target__body">
 
                     <template v-if="updateFormMsg">
                         <div 
-                            class="target__message alert" 
+                            class="alert alert-dismissible fade show target__message"  
                             :class="{ 
                                 'alert-success': updateFormMsg.success, 
                                 'alert-danger': !updateFormMsg.success 
@@ -54,9 +54,7 @@
                             v-if="updateFormMsg.success"
                         >
                             {{ updateFormMsg.text }}
-                            <button type="button" class="close target__messageClose" data-dismiss="alert" aria-label="Close">
-                                <span aria-hidden="true" class="target__messageCloseIcon">&times;</span>
-                            </button>
+                            <button type="button" class="btn-close target__messageClose" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     </template>
 
@@ -117,9 +115,6 @@
 </template>
 
 <script>
-
-import $ from 'jquery'
-
 import { mapActions, mapGetters } from 'vuex'
 
 export default {
@@ -182,12 +177,7 @@ export default {
 
     mounted() {
 
-        const self = this
-
-        $('.target__content').on('hide.bs.collapse', function () {
-            
-            self.showUpdateForm(false)
-        })
+        this.showUpdateForm(false)
     },
 
     watch: {

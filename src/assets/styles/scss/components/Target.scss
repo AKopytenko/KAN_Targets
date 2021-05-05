@@ -5,6 +5,7 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
+        padding: 0 1rem;
     }
     
     &__status {
@@ -21,10 +22,12 @@
     &__content {
 
         background: #fbfbfb;
-        padding: 0 1.5rem 1.5rem;
+        padding: 0 1rem;
     }
 
     &__delete {
+        
+        text-decoration: none;
         cursor: pointer;
         opacity: 0.4;
         color: #777;
@@ -63,6 +66,7 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
+        padding: 0 0 1rem;
         border-top: 1px solid #ddd;
 
         @media (max-width: 767px) {

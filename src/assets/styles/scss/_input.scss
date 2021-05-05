@@ -1,0 +1,35 @@
+.custom-file-input {
+
+    & ~ .custom-file-label {
+ 
+        &:after {
+
+            content: 'Обзор'
+        }
+    }
+}
+
+.btns {
+    
+    margin: 0 -.25rem;
+
+    .btn {
+
+        margin: .25rem;
+    }
+}
+
+.inputWrapper {
+
+    position: relative;
+
+    &__icon {
+
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        margin-top: -8px;
+        opacity: .7;
+        cursor: pointer;
+    }
+}

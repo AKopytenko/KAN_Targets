@@ -6,7 +6,7 @@
             <h3 class="ktg-import__header">Импорт/экспорт</h3>
             <div class="ktg-import__descr">Загрузить/cкачать задачи для переноса между устройствами.</div>
 
-            <div class="mt-3 ktg-import__buttons">
+            <div class="mt-3 btns ktg-import__buttons">
 
                 <button 
                     type="button"
@@ -20,8 +20,8 @@
                 <button 
                     type="button"
                     class="btn btn-primary mr-2 ktg-import__upload"
-                    data-toggle="modal" 
-                    data-target="#importTargetsModal" 
+                    data-bs-toggle="modal" 
+                    data-bs-target="#importTargetsModal" 
                     aria-hidden="true"
                     @click.prevent="importTargetsMsg = null"
                 >
@@ -37,9 +37,7 @@
                 <div class="modal-content ktg-import__modalContent">
                     <div class="modal-header ktg-import__modalHeader">
                         <h5 class="modal-title ktg-import__modalTitle" id="importTargetsModalLabel">Загружить задачи из файла</h5>
-                        <button type="button" class="close ktg-import__modalClose" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+                        <button type="button" class="btn-close ktg-import__modalClose" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <form class="ktg-import__modalForm" action="/" method="post" id="importTargetsForm" @submit.prevent="uploadTargets($event)">
                         <div class="modal-body ktg-import__modalBody">
@@ -61,11 +59,11 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="form-group ktg-import__formGroup">
-                                <label for="importTargetsMethod ktg-import__formLabel"> Способ загрузки:</label>
+                            <div class="mb-3 ktg-import__formGroup">
+                                <label for="importTargetsMethod" class="form-label ktg-import__formLabel">Способ загрузки:</label>
                                 <select 
                                     id="importTargetsMethod" 
-                                    class="custom-select ktg-import__formInput"
+                                    class="form-select ktg-import__formInput"
                                     :class="{ 'is-invalid': 'importTargetsMethod' in invalidFields }" 
                                     @change="checkValid($event)"
                                 >
@@ -84,22 +82,20 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="form-group ktg-import__formGroup">
-                                <div class="custom-file" :class="{ 'is-invalid': 'importTargetsFile' in invalidFields }" >
-                                    <input
-                                        type="file" 
-                                        id="importTargetsFile" 
-                                        class="custom-file-input ktg-import__formInput" 
-                                        accept=".txt"
-                                        :class="{ 'is-invalid': 'importTargetsFile' in invalidFields }" 
-                                        @change="checkValid($event)"
-                                    >
-                                    <label for="importTargetsFile" class="custom-file-label ktg-import__formLabel">Файл задач</label>
-                                </div>
+                            <div class="mb-3 ktg-import__formGroup">
+                                <label for="importTargetsFile" class="form-label ktg-import__formLabel">Файл задач:</label>
+                                <input
+                                    type="file" 
+                                    id="importTargetsFile" 
+                                    class="form-control ktg-import__formInput" 
+                                    accept=".txt"
+                                    :class="{ 'is-invalid': 'importTargetsFile' in invalidFields }" 
+                                    @change="checkValid($event)"
+                                >
                             </div>
                         </div>
                         <div class="modal-footer ktg-import__modalFooter">
-                            <button type="button" class="btn btn-light ktg-import__modalBtn" data-dismiss="modal">Отмена</button>
+                            <button type="button" class="btn btn-light ktg-import__modalBtn" data-bs-dismiss="modal">Отмена</button>
                             <button type="submit" class="btn btn-primary ktg-import__modalBtn">Загрузить</button>
                         </div>
                     </form>
@@ -110,7 +106,6 @@
 </template>
 
 <script>
-import $ from 'jquery'
 import { mapGetters, mapMutations } from 'vuex'
 
 export default {
@@ -162,10 +157,10 @@ export default {
             a.click()
         },
 
-        async uploadTargets(form) {
+        async uploadTargets(event) {
 
             const self = this
-            const fields = form.target.elements
+            const fields = event.target.elements
 
             let data = {}
 
@@ -195,8 +190,6 @@ export default {
                 this.invalidFields.importTargetsFile = true
                 this.formErrors.push('Не выбран файл с задачами')
             }
-
-            {{ this.formErrors }}
 
             if(this.formErrors.length == 0) {
 
@@ -312,22 +305,18 @@ export default {
             }
         },
 
-        checkValid($event) {
+        checkValid(event) {
 
-            $event.target.classList.remove('is-invalid')
+            event.target.classList.remove('is-invalid')
         }
     },
 
     mounted() {
 
-        const self = this
-
-        $('#importTargetsModal').on('hidden.bs.modal', function() {
-            self.formErrors = []
-            self.invalidFields = {}
-            self.importTargetsMsg = null
-            document.querySelector('#importTargetsForm').reset()
-        })
+        this.formErrors = []
+        this.invalidFields = {}
+        this.importTargetsMsg = null
+        document.querySelector('#importTargetsForm').reset()
     }
 }
 </script>

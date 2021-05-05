@@ -1,4 +1,5 @@
 @import './scss/_variables.scss';
+@import './scss/_input.scss';
 @import './scss/components/Targets.scss';
 @import './scss/components/CreateTarget.scss';
 @import '~@fortawesome/fontawesome-free/css/all.min.css';
@@ -6,32 +7,7 @@
 body {
 
     background-image: url('~@/assets/img/bg-body.png');
-}
-
-.custom-file-input {
-
-    & ~ .custom-file-label {
- 
-        &:after {
-
-            content: 'Обзор'
-        }
-    }
-}
-
-.inputWrapper {
-
-    position: relative;
-
-    &__icon {
-
-        position: absolute;
-        right: 10px;
-        top: 50%;
-        margin-top: -8px;
-        opacity: .7;
-        cursor: pointer;
-    }
+    overflow-y: scroll;
 }
 
 .ktg-card {
