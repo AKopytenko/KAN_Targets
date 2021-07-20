@@ -36,7 +36,7 @@
             <div class="modal-dialog ktg-import__modalDialog">
                 <div class="modal-content ktg-import__modalContent">
                     <div class="modal-header ktg-import__modalHeader">
-                        <h5 class="modal-title ktg-import__modalTitle" id="importTargetsModalLabel">Загружить задачи из файла</h5>
+                        <h5 class="modal-title ktg-import__modalTitle" id="importTargetsModalLabel">Загрузить задачи из файла</h5>
                         <button type="button" class="btn-close ktg-import__modalClose" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <form class="ktg-import__modalForm" action="/" method="post" id="importTargetsForm" @submit.prevent="uploadTargets($event)">
