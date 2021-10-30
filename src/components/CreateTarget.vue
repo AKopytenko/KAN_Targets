@@ -125,7 +125,7 @@ export default {
                 this.formErrors.push('Введите текст задачи')
             }
 
-            data.priority = fields.targetDescr.value
+            data.priority = fields.targetPriority.checked
 
             data.created = (Date.now() / 1000).toFixed()
 
