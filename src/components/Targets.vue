@@ -128,7 +128,7 @@ export default {
 
         clearSearchInput() {
 
-            document.querySelector('#searchTargets').value = ''
+            this.inputSearch = ''
             this.searchTargetsIcon = false
             this.filterTargets()
         },
