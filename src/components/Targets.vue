@@ -24,7 +24,7 @@
                         id="searchTargets" 
                         v-model="inputSearch"
                     >
-                    <i class="fas fa-times-circle inputWrapper__icon" v-if="searchTargetsIcon" @click.prevent="clearSearchInput"></i>
+                    <i class="fas fa-times-circle inputWrapper__icon" v-if="inputSearch.length" @click.prevent="inputSearch = ''"></i>
                 </div>
                 
                 <div class="alert alert-danger mt-4 ktg-targets__searchError" v-if="filteredTargetsEmpty">{{ filteredTargetsEmpty }}</div>
@@ -126,21 +126,12 @@ export default {
             'deleteTarget'
         ]),
 
-        clearSearchInput() {
-
-            this.inputSearch = ''
-            this.searchTargetsIcon = false
-            this.filterTargets()
-        },
-
         filterTargets(input) {
 
             this.filteredTargets = []
             this.filteredTargetsEmpty = null
 
             if(input && input.length > 2) {
-
-                this.searchTargetsIcon = true
 
                 if(this.getTargets.length) {
 
@@ -164,7 +155,6 @@ export default {
 
                 this.filteredTargets = []
                 this.filteredTargetsEmpty = null
-                this.searchTargetsIcon = false
             }
         },
 
