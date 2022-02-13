@@ -1,29 +1,30 @@
-# KAN-Targets
+# KAN-Targets  
 
+**RU**  
 Задачник с сохранением задач в локальной памяти браузера и возможностью импорта/экспорта для переноса между устройствами.
 
-### DEMO
-http://wr-team.ru/demo/kantargets/
+**EN**  
+Task book with saving in the local memory of the browser + import/export of tasks.
 
-## Установка
+### Установка | Install
 ```
 npm i
 ```
 
-### Запуск на dev-сервере
+### Запуск на тестовом сервере | Start on dev-server
 ```
 npm run serve
 ```
 
-### Сборка production
+### Сборка проекта | Build production
 ```
 npm run build
 ```  
 
-### Preview  
+### Предпросмотр | Preview  
 
-#### Desktop  
+#### Вид для больших экранов | Desktop view  
 ![](https://github.com/AKopytenko/KAN-Targets/blob/master/preview/kantargets-preview-desktop.jpg)
 
-#### Mobile  
+#### Вид для мобильных устройств | Mobile view  
 ![](https://github.com/AKopytenko/KAN-Targets/blob/master/preview/kantargets-preview-mobile.jpg)
