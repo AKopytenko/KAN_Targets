@@ -9,10 +9,7 @@
                         <div class="ktg-targets__headerLogo">KAN-Targets</div>
                     </div>
                     <div class="col-4 col-sm-3 col-md-5 col-lg-6 col-xl-7">
-                        <select id="KTGLang" @change="setLang($event.target.value)" :value="getLang">
-                            <option value="RU">RU</option>
-                            <option value="EN">EN</option>
-                        </select>
+                        <KTGLang />
                     </div>
                     <div class="col-12 col-sm-5 col-md-4 col-lg-3 col-xl-3">
                         <CreateTarget />
@@ -26,7 +23,7 @@
                     <input 
                         class="form-control ktg-targets__searchInput inputWrapper__field" 
                         type="text" 
-                        placeholder="Поиск задач..." 
+                        :placeholder="getTranslate.TARGETS_SEARCH + '...'" 
                         id="searchTargets" 
                         v-model="inputSearch"
                     >
@@ -83,6 +80,7 @@ import 'bootstrap'
 
 import { mapGetters, mapActions } from 'vuex'
 
+import KTGLang          from '@/components/KTGLang'
 import Target           from './Target'
 import CreateTarget     from './CreateTarget'
 import ImportTargets    from './ImportTargets'
@@ -107,6 +105,7 @@ export default {
 
     components: {
 
+        KTGLang,
         Target,
         CreateTarget,
         ImportTargets

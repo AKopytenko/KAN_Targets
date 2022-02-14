@@ -14,6 +14,7 @@ export default {
             BTN_DELETE:                 'Удалить',
 
             TARGETS_EMPTY:              'Список задач пуст',
+            TARGETS_SEARCH:             'Поиск задач',
 
             TARGET_NEW_HEADER:          'Новая задача',
             TARGET_NEW_NAME:            'Название',
@@ -64,6 +65,7 @@ export default {
             BTN_DELETE:                 'Delete',
 
             TARGETS_EMPTY:              'Targets list empty',
+            TARGETS_SEARCH:             'Search',
 
             TARGET_NEW_HEADER:          'New target',
             TARGET_NEW_NAME:            'Title',
