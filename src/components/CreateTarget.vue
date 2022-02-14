@@ -1,20 +1,20 @@
 <template>
     <div class="ktg-createTarget">
 
-        <a href="#" class="btn btn-primary mt-4 mt-sm-0 ktg-createTarget__btnModal" data-bs-toggle="modal" data-bs-target="#createTargetModal" aria-hidden="true">Новая задача</a>
-        
+        <a href="#" class="btn btn-primary mt-4 mt-sm-0 ktg-createTarget__btnModal" data-bs-toggle="modal" data-bs-target="#createTargetModal" aria-hidden="true">{{ getTranslate.BTN_NEW_TASK }}</a>
+
         <div class="modal fade ktg-createTarget__modalAdd" tabindex="-1" role="dialog" id="createTargetModal" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Новая задача</h5>
+                        <h5 class="modal-title">{{ getTranslate.TARGET_NEW_HEADER }}</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <form class="ktg-createTarget__form" action="/" method="post" @submit.prevent="sendTargetForm($event)" id="createTargetForm">
                         <div class="modal-body">
-                            <div class="mb-3 ktg-createTarget__result" v-if="createTargetFormMsg">
-                                <div class="alert alert-success" v-if="createTargetFormMsg.success">{{ createTargetFormMsg.success }}</div>
-                                <div class="alert alert-danger" v-if="createTargetFormMsg.error">{{ createTargetFormMsg.error }}</div>
+                            <div class="mb-3 ktg-createTarget__result" v-if="getCreateTargetMsg">
+                                <div class="alert alert-success" v-if="getCreateTargetMsg.success">{{ getCreateTargetMsg.text }}</div>
+                                <div class="alert alert-danger" v-if="getCreateTargetMsg.error">{{ getCreateTargetMsg.text }}</div>
                             </div>
                             <div class="ktg-createTarget__error" v-if="formErrors.length">
                                 <div class="alert alert-danger">
@@ -24,7 +24,7 @@
                                 </div>
                             </div>
                             <div class="mb-3 ktg-createTarget__form-group">
-                                <label for="targetName">Название</label>
+                                <label for="targetName">{{ getTranslate.TARGET_NEW_NAME }}</label>
                                 <input 
                                     type="text" 
                                     class="form-control" 
@@ -35,7 +35,7 @@
                                 >
                             </div>
                             <div class="mb-3 ktg-createTarget__formform-group">
-                                <label for="targetDescr">Описание</label>
+                                <label for="targetDescr">{{ getTranslate.TARGET_NEW_TEXT }}</label>
                                 <textarea 
                                     class="form-control" 
                                     id="targetDescr" 
@@ -47,12 +47,12 @@
                             </div>
                             <div class="form-check ktg-createTarget__formform-group">
                                 <input type="checkbox" class="form-check-input" id="targetPriority" aria-describedby="targetPriorityHelp">
-                                <label class="form-check-label" for="targetPriority">Приоритетная задача</label>
+                                <label class="form-check-label" for="targetPriority">{{ getTranslate.TARGET_NEW_PRIORITY }}</label>
                             </div>
                         </div>
                         <div class="modal-footer ktg-createTarget__btns">
-                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Отмена</button>
-                            <button type="submit" class="btn btn-primary">Добавить</button>
+                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ getTranslate.BTN_CANCEL }}</button>
+                            <button type="submit" class="btn btn-primary">{{ getTranslate.BTN_ADD }}</button>
                         </div>
                     </form>
                 </div>
@@ -64,7 +64,7 @@
 
 <script>
 
-import { mapGetters, mapActions } from 'vuex'
+import { mapGetters, mapActions, mapMutations } from 'vuex'
 
 export default {
 
@@ -77,23 +77,30 @@ export default {
             invalidFields: {},
             formErrors: [],
 
-            modalShow: false,
-            createTargetFormMsg: null
+            modalShow: false
         }
     },
+
     computed: {
 
         ...mapGetters([
 
+            'getTranslate',
             'getTargets', 
             'getCreateTargetMsg'
         ])
     },
+
     methods: {
 
         ...mapActions([
 
             'createTarget'
+        ]),
+
+        ...mapMutations([
+
+            'setCreateTargetMsg'
         ]),
 
         sendTargetForm(event) {
@@ -102,6 +109,7 @@ export default {
 
             this.invalidFields = {}
             this.formErrors = []
+            this.setCreateTargetMsg(null)
 
             let data = {}
 
@@ -112,7 +120,7 @@ export default {
             } else {
 
                 this.invalidFields.targetName = true
-                this.formErrors.push('Введите название задачи')
+                this.formErrors.push(this.getTranslate.ERROR_TARGET_TITLE)
             }
 
             if(fields.targetDescr.value) {
@@ -122,7 +130,7 @@ export default {
             } else {
 
                 this.invalidFields.targetDescr = true
-                this.formErrors.push('Введите текст задачи')
+                this.formErrors.push(this.getTranslate.ERROR_TARGET_TEXT)
             }
 
             data.priority = fields.targetPriority.checked
@@ -140,17 +148,23 @@ export default {
             event.target.classList.remove('is-invalid')
         }
     },
+
     mounted() {
 
-        this.createTargetFormMsg = null
+        const self = this
+        const createTargetModal = document.getElementById('createTargetModal')
+
+        createTargetModal.addEventListener('show.bs.modal', function () {
+
+            self.setCreateTargetMsg(null)
+        })
     },
+
     watch: {
 
         getCreateTargetMsg(msg) {
 
-            this.createTargetFormMsg = msg
-
-            if('success' in msg) {
+            if(msg && msg.success) {
 
                 document.querySelector('#createTargetForm').reset()
             }

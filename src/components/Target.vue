@@ -63,37 +63,34 @@
                         <textarea v-model="target.descr" id="targetUpdateDescr" class="form-control target__descrUpdate" v-if="updateForm" rows="6"></textarea>
                     </div>
 
-                    <div class="form-group form-check target__state" v-if="updateForm">
+                    <div class="form-group form-check target__state my-4" v-if="updateForm">
                         <input type="checkbox" :checked="target.completed" id="targetUpdateState" class="form-check-input target__stateUpdate">
-                        <label class="form-check-label" for="targetUpdateState">Задача завершена</label>
+                        <label class="form-check-label" for="targetUpdateState">{{ getTranslate.TARGET_CLOSED }}</label>
                     </div>
 
                     <div class="target__footer mt-4 pt-3">
 
-                        <div class="target__created">Добавлена: {{ new Date(target.created * 1000).toLocaleString() }}</div>
+                        <div class="target__created">{{ getTranslate.TARGET_DATE }}: {{ new Date(target.created * 1000).toLocaleString() }}</div>
                         
-                        <input 
+                        <button 
                             class="btn btn-primary target__updateShow" 
                             type="button"
-                            value="Редактировать"
                             @click.prevent="showUpdateForm(true)" 
                             v-if="!updateForm"
-                        >
+                        >{{ getTranslate.BTN_EDIT }}</button>
 
-                        <input 
+                        <button 
                             class="btn btn-light target__updateHide"
                             type="button" 
-                            value="Отмена" 
                             @click.prevent="showUpdateForm(false)"
                             v-if="updateForm"
-                        >
+                        >{{ getTranslate.BTN_CANCEL }}</button>
 
-                        <input 
+                        <button 
                             class="btn btn-primary target__updateSave" 
                             type="submit"
-                            value="Сохранить"
                             v-if="updateForm"
-                        >
+                        >{{ getTranslate.BTN_SAVE }}</button>
 
                         <input 
                             type="hidden" 
@@ -143,6 +140,7 @@ export default {
 
         ...mapGetters([
 
+            'getTranslate',
             'getTargets', 
             'getUpdateTargetMsg'
         ])

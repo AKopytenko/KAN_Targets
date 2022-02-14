@@ -3,8 +3,8 @@
 
         <div class="ktg-card__body ktg-import__body">
 
-            <h3 class="ktg-import__header">Импорт/экспорт</h3>
-            <div class="ktg-import__descr">Загрузить/cкачать задачи для переноса между устройствами.</div>
+            <h3 class="ktg-import__header">{{ getTranslate.IMPORT_TITLE }}</h3>
+            <div class="ktg-import__descr">{{ getTranslate.IMPORT_DESCR }}.</div>
 
             <div class="mt-3 btns ktg-import__buttons">
 
@@ -14,7 +14,7 @@
                     :disabled="!getTargets.length"
                     @click.prevent="downloadTargets()"
                 >
-                    Скачать
+                    {{ getTranslate.BTN_DOWNLOAD }}
                 </button>
 
                 <button 
@@ -25,7 +25,7 @@
                     aria-hidden="true"
                     @click.prevent="importTargetsMsg = null"
                 >
-                    Загрузить
+                    {{ getTranslate.BTN_UPLOAD }}
                 </button>
 
             </div>
@@ -36,7 +36,7 @@
             <div class="modal-dialog ktg-import__modalDialog">
                 <div class="modal-content ktg-import__modalContent">
                     <div class="modal-header ktg-import__modalHeader">
-                        <h5 class="modal-title ktg-import__modalTitle" id="importTargetsModalLabel">Загрузить задачи из файла</h5>
+                        <h5 class="modal-title ktg-import__modalTitle" id="importTargetsModalLabel">{{ getTranslate.IMPORT_HEADER }}</h5>
                         <button type="button" class="btn-close ktg-import__modalClose" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <form class="ktg-import__modalForm" action="/" method="post" id="importTargetsForm" @submit.prevent="uploadTargets($event)">
@@ -60,7 +60,7 @@
                                 </div>
                             </div>
                             <div class="mb-3 ktg-import__formGroup">
-                                <label for="importTargetsMethod" class="form-label ktg-import__formLabel">Способ загрузки:</label>
+                                <label for="importTargetsMethod" class="form-label ktg-import__formLabel">{{ getTranslate.IMPORT_METHOD }}:</label>
                                 <select 
                                     id="importTargetsMethod" 
                                     class="form-select ktg-import__formInput"
@@ -68,22 +68,22 @@
                                     @change="checkValid($event)"
                                 >
                                     <option value="" selected disabled>...</option>
-                                    <option value="push">Добавить</option>
-                                    <option value="rewrite">Перезаписать</option>
+                                    <option value="push">{{ getTranslate.IMPORT_ADD }}</option>
+                                    <option value="rewrite">{{ getTranslate.IMPORT_REWRITE }}</option>
                                 </select>
                                 <div class="mt-3 mb-4 ktg-import__formDescr">
                                     <div class="my-2 ktg-import__formDescrItem">
-                                        <strong>Добавить</strong> 
-                                        Задачи из файла будут добавлены к уже существующим.
+                                        <strong>{{ getTranslate.IMPORT_ADD }}</strong> 
+                                        {{ getTranslate.IMPORT_ADD_DESCR }}
                                     </div>
                                     <div class="my-2 ktg-import__formDescrItem">
-                                        <strong>Перезаписать</strong> 
-                                        Существующие задачи будут УДАЛЕНЫ, после загрузки останутся только задачи из файла.
+                                        <strong>{{ getTranslate.IMPORT_REWRITE }}</strong> 
+                                        {{ getTranslate.IMPORT_REWRITE_DESCR }}
                                     </div>
                                 </div>
                             </div>
                             <div class="mb-3 ktg-import__formGroup">
-                                <label for="importTargetsFile" class="form-label ktg-import__formLabel">Файл задач:</label>
+                                <label for="importTargetsFile" class="form-label ktg-import__formLabel">{{ getTranslate.IMPORT_FILE_TITLE }}:</label>
                                 <input
                                     type="file" 
                                     id="importTargetsFile" 
@@ -95,8 +95,8 @@
                             </div>
                         </div>
                         <div class="modal-footer ktg-import__modalFooter">
-                            <button type="button" class="btn btn-light ktg-import__modalBtn" data-bs-dismiss="modal">Отмена</button>
-                            <button type="submit" class="btn btn-primary ktg-import__modalBtn">Загрузить</button>
+                            <button type="button" class="btn btn-light ktg-import__modalBtn" data-bs-dismiss="modal">{{ getTranslate.BTN_CANCEL }}</button>
+                            <button type="submit" class="btn btn-primary ktg-import__modalBtn">{{ getTranslate.BTN_UPLOAD }}</button>
                         </div>
                     </form>
                 </div>
@@ -126,6 +126,7 @@ export default {
 
         ...mapGetters([
 
+            'getTranslate',
             'getTargets'
         ])
     },
@@ -171,7 +172,7 @@ export default {
                 data.method = fields.importTargetsMethod.value
             } else {
                 this.invalidFields.importTargetsMethod = true
-                this.formErrors.push('Не выбран способ загрузки')
+                this.formErrors.push(this.getTranslate.ERROR_IMPORT_METHOD)
             }
 
             if(fields.importTargetsFile.value) {
@@ -184,11 +185,11 @@ export default {
                     data.file = fields.importTargetsFile.files[0]
                 } else {
                     this.invalidFields.importTargetsFile = true
-                    this.formErrors.push('Неверный формат файла')
+                    this.formErrors.push(this.getTranslate.ERROR_IMPORT_FILE_FORMAT)
                 }
             } else {
                 this.invalidFields.importTargetsFile = true
-                this.formErrors.push('Не выбран файл с задачами')
+                this.formErrors.push(this.getTranslate.ERROR_IMPORT_FILE)
             }
 
             if(this.formErrors.length == 0) {
@@ -200,7 +201,7 @@ export default {
                 switch( data.method ) {
 
                     case 'rewrite':
-                        
+
                         reader.readAsText(data.file)
 
                         reader.onload = function(event) {
@@ -233,13 +234,13 @@ export default {
                                 }
                             } catch {
 
-                                self.importTargetsMsg = { success: false, text: 'Неверный формат файла!' }
+                                self.importTargetsMsg = { success: false, text: self.getTranslate.ERROR_IMPORT_FILE_FORMAT }
                                 return false
                             }
 
                             self.setTargets(targets)
 
-                            self.importTargetsMsg = { success: true, text: 'Задачи успешно загружены' }
+                            self.importTargetsMsg = { success: true, text: self.getTranslate.IMPORT_SUCCESS }
                         }
 
                         break
@@ -288,7 +289,7 @@ export default {
                                 }
                             } catch {
 
-                                self.importTargetsMsg = { success: false, text: 'Неверный формат файла!' }
+                                self.importTargetsMsg = { success: false, text: self.getTranslate.ERROR_IMPORT_FILE_FORMAT }
                                 return false
                             }
 
@@ -296,7 +297,7 @@ export default {
 
                             self.setTargets(targets)
 
-                            self.importTargetsMsg = { success: true, text: 'Задачи успешно загружены' }
+                            self.importTargetsMsg = { success: true, text: self.getTranslate.IMPORT_SUCCESS }
                         }
 
                         break

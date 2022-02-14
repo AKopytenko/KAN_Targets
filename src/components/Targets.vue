@@ -1,14 +1,20 @@
 <template>
     <div class="ktg-targets">
-        
+
         <div class="container ktg-targets__container">
             
             <div class="ktg-targets__header my-4 pb-4">
                 <div class="row align-items-center">
-                    <div class="col-12 col-sm-6">
+                    <div class="col-8 col-sm-4 col-md-3 col-lg-3 col-xl-2">
                         <div class="ktg-targets__headerLogo">KAN-Targets</div>
                     </div>
-                    <div class="col-12 col-sm-6">
+                    <div class="col-4 col-sm-3 col-md-5 col-lg-6 col-xl-7">
+                        <select id="KTGLang" @change="setLang($event.target.value)" :value="getLang">
+                            <option value="RU">RU</option>
+                            <option value="EN">EN</option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-sm-5 col-md-4 col-lg-3 col-xl-3">
                         <CreateTarget />
                     </div>
                 </div>
@@ -43,7 +49,7 @@
             </div>
 
             <div class="ktg-targets__empty my-4" v-if="!targets.length">
-                Список задач пуст...
+                {{ getTranslate.TARGETS_EMPTY }}
             </div>
 
             <ImportTargets v-if="targets" />
@@ -54,15 +60,15 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="deleteTargetModalLabel">Удаление задачи</h5>
+                        <h5 class="modal-title" id="deleteTargetModalLabel">{{ getTranslate.TARGET_DELETE_HEADER }}</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        Выбранная задача будет удалена без возможности восстановления.
+                        {{ getTranslate.TARGET_DELETE_ALERT }}.
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Отмена</button>
-                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @click="deleteTarget(deleteTargetID)">УДАЛИТЬ</button>
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ getTranslate.BTN_CANCEL }}</button>
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @click="deleteTarget(deleteTargetID)">{{ getTranslate.BTN_DELETE }}</button>
                     </div>
                 </div>
             </div>
@@ -82,31 +88,37 @@ import CreateTarget     from './CreateTarget'
 import ImportTargets    from './ImportTargets'
 
 export default {
+
     name: 'Targets',
+
     data() {
 
         return {
-            
+
             deleteTargetID: null,
 
             filteredTargets: [],
             filteredTargetsEmpty: null,
-            
+
             inputSearch: '',
             searchTargetsIcon: false
         }
     },
+
     components: {
 
         Target,
         CreateTarget,
         ImportTargets
     },
+
     computed: {
 
         ...mapGetters([
 
-            'getTargets'
+            'getTargets',
+            'getTranslate',
+            'getLang'
         ]),
 
         targets() {
@@ -118,12 +130,14 @@ export default {
             }
         }
     },
+
     methods: {
 
         ...mapActions([
 
             'readTargets', 
-            'deleteTarget'
+            'deleteTarget',
+            'setLang'
         ]),
 
         filterTargets(input) {
@@ -140,7 +154,7 @@ export default {
                         const reg = new RegExp(input.toUpperCase(), 'g')
 
                         if( reg.test(target.name.toUpperCase()) || reg.test(target.descr.toUpperCase()) ) {
-                            
+
                             this.filteredTargets.push(target)
                         }
                     }
@@ -148,7 +162,7 @@ export default {
                     if(this.filteredTargets.length == 0) {
 
                         this.filteredTargets = []
-                        this.filteredTargetsEmpty = 'Нет задач, содержащих указанные данные.'
+                        this.filteredTargetsEmpty = this.getTranslate.ERROR_SEARCH_EMPTY
                     }
                 }
             } else {
@@ -163,10 +177,12 @@ export default {
             this.deleteTargetID = id
         }
     },
+
     mounted() {
 
         this.readTargets()
     },
+
     watch: {
 
         inputSearch(text) {
