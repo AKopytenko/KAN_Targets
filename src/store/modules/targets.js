@@ -59,7 +59,7 @@ export default {
 
             } catch {
 
-                state.createTargetMsg = { success: false, text: getters.getTranslate.ERROR_TARGET_ADD  }
+                state.createTargetMsg = { success: false, text: getters.getTranslate.ERROR_TARGET_ADD }
             }
         },
 
@@ -107,11 +107,11 @@ export default {
                 localStorage.removeItem('KTG_LIST')
                 localStorage.setItem('KTG_LIST', JSON.stringify(state.targets))
 
-                state.updateTargetMsg = { success: true, text: getters.getTranslate.TARGET_UPDATE_SUCCESS }
+                state.updateTargetMsg = { success: true, text: getters.getTranslate.TARGET_UPDATE_SUCCESS, id: targetData.id }
 
             } catch {
 
-                state.updateTargetMsg = { success: false, text: getters.getTranslate.ERROR_TARGET_EDIT }
+                state.updateTargetMsg = { success: false, text: getters.getTranslate.ERROR_TARGET_EDIT, id: targetData.id }
             }
         },
 
@@ -152,6 +152,7 @@ export default {
             localStorage.setItem( 'KTG_LIST', JSON.stringify(targets) )
         },
 
-        setCreateTargetMsg: (state, data) => state.createTargetMsg = data
+        setCreateTargetMsg: (state, data) => state.createTargetMsg = data,
+        setUpdateTargetMsg: (state, data) => state.updateTargetMsg = data
     }
 }

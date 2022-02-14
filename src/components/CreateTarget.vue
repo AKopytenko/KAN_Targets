@@ -156,6 +156,8 @@ export default {
 
         createTargetModal.addEventListener('show.bs.modal', function () {
 
+            self.invalidFields = {}
+            self.formErrors = []
             self.setCreateTargetMsg(null)
         })
     },

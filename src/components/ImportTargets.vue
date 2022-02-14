@@ -314,10 +314,16 @@ export default {
 
     mounted() {
 
-        this.formErrors = []
-        this.invalidFields = {}
-        this.importTargetsMsg = null
-        document.querySelector('#importTargetsForm').reset()
+        const self = this
+        const importTargetsModal = document.getElementById('importTargetsModal')
+
+        importTargetsModal.addEventListener('show.bs.modal', function () {
+
+            self.formErrors = []
+            self.invalidFields = {}
+            self.importTargetsMsg = null
+            document.querySelector('#importTargetsForm').reset()
+        })
     }
 }
 </script>

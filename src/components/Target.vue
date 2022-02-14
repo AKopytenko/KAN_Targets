@@ -44,16 +44,15 @@
 
                 <div class="target__body">
 
-                    <template v-if="updateFormMsg">
+                    <template v-if="updateTargetMsg && updateTargetMsg.id == target.id">
                         <div 
-                            class="alert alert-dismissible fade show target__message"  
+                            class="alert alert-dismissible target__message"  
                             :class="{ 
-                                'alert-success': updateFormMsg.success, 
-                                'alert-danger': !updateFormMsg.success 
-                            }" 
-                            v-if="updateFormMsg.success"
+                                'alert-success': updateTargetMsg.success, 
+                                'alert-danger': !updateTargetMsg.success 
+                            }"
                         >
-                            {{ updateFormMsg.text }}
+                            {{ updateTargetMsg.text }}
                             <button type="button" class="btn-close target__messageClose" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     </template>
@@ -112,7 +111,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 
 export default {
 
@@ -121,7 +120,7 @@ export default {
     props: {
 
         target: {
-            
+
             required: true,
             type: Object
         }
@@ -138,11 +137,15 @@ export default {
     
     computed: {
 
+        ...mapState({
+
+            updateTargetMsg: state => state.targets.updateTargetMsg
+        }),
+
         ...mapGetters([
 
             'getTranslate',
-            'getTargets', 
-            'getUpdateTargetMsg'
+            'getTargets'
         ])
     },
 
@@ -151,6 +154,11 @@ export default {
         ...mapActions([
 
             'updateTarget'
+        ]),
+
+        ...mapMutations([
+
+            'setUpdateTargetMsg'
         ]),
 
         showUpdateForm(mode) {
@@ -175,7 +183,19 @@ export default {
 
     mounted() {
 
-        this.showUpdateForm(false)
+        const self = this
+        const targetsTabs = document.getElementsByClassName('target__content')
+
+        self.showUpdateForm(false)
+
+        for(let tab of targetsTabs) {
+
+            tab.addEventListener('hide.bs.collapse', function () {
+
+                self.showUpdateForm(false)
+                self.setUpdateTargetMsg(null)
+            })
+        }
     },
 
     watch: {
