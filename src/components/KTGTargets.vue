@@ -6,13 +6,13 @@
             <div class="ktg-targets__header my-4 pb-4">
                 <div class="row align-items-center">
                     <div class="col-8 col-sm-4 col-md-3 col-lg-3 col-xl-2">
-                        <div class="ktg-targets__headerLogo">KAN-Targets</div>
+                        <div class="ktg-targets__header-logo">KAN-Targets</div>
                     </div>
                     <div class="col-4 col-sm-3 col-md-5 col-lg-6 col-xl-7">
                         <KTGLang />
                     </div>
                     <div class="col-12 col-sm-5 col-md-4 col-lg-3 col-xl-3">
-                        <CreateTarget />
+                        <KTGCreateTarget />
                     </div>
                 </div>
             </div>
@@ -35,10 +35,9 @@
 
             <div class="ktg-targets__list my-4" v-if="targets.length">
                 <div class="accordion ktg-targets__accordion" id="targetsList">
-                    <template v-for="target in targets">
-                        <Target 
+                    <template v-for="target in targets" :key="target.id">
+                        <KTGTarget 
                             :target="target"
-                            :key="target.id"
                             @delete-target-id="setDeleteTargetID($event)" 
                         />
                     </template>
@@ -49,7 +48,7 @@
                 {{ getTranslate.TARGETS_EMPTY }}
             </div>
 
-            <ImportTargets v-if="targets" />
+            <KTGImportTargets v-if="targets" />
 
         </div>
 
@@ -81,13 +80,13 @@ import 'bootstrap'
 import { mapGetters, mapActions } from 'vuex'
 
 import KTGLang          from '@/components/KTGLang'
-import Target           from './Target'
-import CreateTarget     from './CreateTarget'
-import ImportTargets    from './ImportTargets'
+import KTGTarget        from '@/components/KTGTarget'
+import KTGCreateTarget  from '@/components/KTGCreateTarget'
+import KTGImportTargets from '@/components/KTGImportTargets'
 
 export default {
 
-    name: 'Targets',
+    name: 'KTGTargets',
 
     data() {
 
@@ -106,9 +105,9 @@ export default {
     components: {
 
         KTGLang,
-        Target,
-        CreateTarget,
-        ImportTargets
+        KTGTarget,
+        KTGCreateTarget,
+        KTGImportTargets
     },
 
     computed: {
@@ -193,7 +192,5 @@ export default {
 </script>
 
 <style lang="scss">
-@import '~bootstrap/dist/css/bootstrap.min.css';
-@import '~@fortawesome/fontawesome-free/css/all.min.css';
-@import '@/assets/styles/layout.scss';
+@import '@/assets/styles/scss/components/targets.scss';
 </style>

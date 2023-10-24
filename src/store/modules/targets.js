@@ -27,10 +27,10 @@ export default {
 
             let createTarget = {
 
-                name: targetData.name,
-                descr: targetData.descr,
-                priority: targetData.priority,
-                created: targetData.created
+                name:       targetData.name,
+                descr:      targetData.descr,
+                priority:   targetData.priority,
+                created:    targetData.created
             }
 
             if(state.targets.length) {
@@ -98,12 +98,13 @@ export default {
 
                     if(target.id == targetData.id) {
 
-                        target.name      = targetData.name
-                        target.descr     = targetData.descr
-                        target.completed = targetData.completed
+                        target.name         = targetData.name
+                        target.descr        = targetData.descr
+                        target.priority     = targetData.priority
+                        target.completed    = targetData.completed
                     }
                 })
-                
+
                 localStorage.removeItem('KTG_LIST')
                 localStorage.setItem('KTG_LIST', JSON.stringify(state.targets))
 

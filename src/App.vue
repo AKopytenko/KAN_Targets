@@ -2,16 +2,15 @@
 
     <div id="app">
 
-        <Targets />
+        <KTGTargets />
 
     </div>
 
 </template>
 
 <script>
-
 import { mapActions } from 'vuex'
-import Targets from './components/Targets.vue'
+import KTGTargets from './components/KTGTargets.vue'
 
 export default {
 
@@ -19,7 +18,7 @@ export default {
 
     components: {
 
-        Targets
+        KTGTargets
     },
 
     methods: {
@@ -41,3 +40,7 @@ export default {
     }
 }
 </script>
+
+<style lang="scss">
+@import '@/assets/styles/scss/layout.scss';
+</style>

@@ -1,8 +1,7 @@
-@import './scss/_variables.scss';
-@import './scss/_input.scss';
-@import './scss/components/Targets.scss';
-@import './scss/components/CreateTarget.scss';
+@import '~bootstrap/dist/css/bootstrap.min.css';
 @import '~@fortawesome/fontawesome-free/css/all.min.css';
+@import '@/assets/styles/scss/_variables.scss';
+@import '@/assets/styles/scss/_input.scss';
 
 body {
 

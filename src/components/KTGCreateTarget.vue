@@ -68,7 +68,7 @@ import { mapGetters, mapActions, mapMutations } from 'vuex'
 
 export default {
 
-    name: 'CreateTarget.vue',
+    name: 'KTGCreateTarget.vue',
 
     data() {
 
@@ -133,8 +133,7 @@ export default {
                 this.formErrors.push(this.getTranslate.ERROR_TARGET_TEXT)
             }
 
-            data.priority = fields.targetPriority.checked
-
+            data.priority = fields.targetPriority.checked || false
             data.created = (Date.now() / 1000).toFixed()
 
             if(this.formErrors.length == 0) {
@@ -174,3 +173,7 @@ export default {
     }
 }
 </script>
+
+<style lang="scss">
+@import '@/assets/styles/scss/components/create-target';
+</style>

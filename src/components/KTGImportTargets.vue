@@ -110,7 +110,7 @@ import { mapGetters, mapMutations } from 'vuex'
 
 export default {
 
-    name: 'ImportTargets',
+    name: 'KTGImportTargets',
 
     data() {
 
@@ -212,26 +212,34 @@ export default {
 
                                 for(let target of fileContent) {
 
-                                    if(
+                                    if( 
+                                        'id'        in target &&
                                         'name'      in target && 
                                         'descr'     in target && 
                                         'priority'  in target && 
-                                        'completed' in target &&
-                                        'created'   in target && 
-                                        'id'        in target
+                                        'created'   in target 
                                     ) {
+                                        
+                                        console.log('rewrite - Формат: ОК')
 
                                         targets.push({
-
-                                            name: target.name,
-                                            descr: target.descr,
-                                            priority: target.priority,
-                                            completed: target.completed,
-                                            created: target.created,
-                                            id: target.id
+                                            
+                                            id:         target.id,
+                                            name:       target.name,
+                                            descr:      target.descr,
+                                            priority:   target.priority,
+                                            created:    target.created
                                         })
+
+                                    } else {
+                                        
+                                        console.log('rewrite - Формат: FAIL', target)
+
+                                        self.importTargetsMsg = { success: false, text: self.getTranslate.ERROR_IMPORT_FILE_FORMAT }
+                                        return false
                                     }
                                 }
+
                             } catch {
 
                                 self.importTargetsMsg = { success: false, text: self.getTranslate.ERROR_IMPORT_FILE_FORMAT }
@@ -267,26 +275,35 @@ export default {
                                 for(let target of fileContent) {
 
                                     if(
+                                        'id'        in target && 
                                         'name'      in target && 
                                         'descr'     in target && 
                                         'priority'  in target && 
-                                        'completed' in target &&
                                         'created'   in target
                                     ) {
+                                        
+                                        console.log('push - Формат: ОК')
 
                                         targets.push({
 
+                                            id: targetID, 
                                             name: target.name,
                                             descr: target.descr,
                                             priority: target.priority,
-                                            completed: target.completed,
-                                            created: target.created,
-                                            id: targetID
+                                            created: target.created
                                         })
 
                                         targetID++
+
+                                    } else {
+
+                                        console.log('push - Формат: FAIL', target)
+
+                                        self.importTargetsMsg = { success: false, text: self.getTranslate.ERROR_IMPORT_FILE_FORMAT }
+                                        return false
                                     }
                                 }
+
                             } catch {
 
                                 self.importTargetsMsg = { success: false, text: self.getTranslate.ERROR_IMPORT_FILE_FORMAT }
@@ -329,5 +346,5 @@ export default {
 </script>
 
 <style lang="scss">
-@import '@/assets/styles/scss/components/ImportTargets.scss';
+@import '@/assets/styles/scss/components/import-targets';
 </style>

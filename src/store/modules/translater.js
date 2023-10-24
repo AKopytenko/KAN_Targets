@@ -24,6 +24,7 @@ export default {
 
             TARGET_DATE:                'Добавлена',
             TARGET_CLOSED:              'Задача завершена',
+            TARGET_PRIORITY:            'Приоритетная задача',
 
             TARGET_DELETE_HEADER:       'Удаление задачи',
             TARGET_DELETE_ALERT:        'Выбранная задача будет удалена без возможности восстановления',
@@ -75,6 +76,7 @@ export default {
 
             TARGET_DATE:                'Date',
             TARGET_CLOSED:              'Target closed',
+            TARGET_PRIORITY:            'Priority target',
 
             TARGET_DELETE_HEADER:       'Task delete',
             TARGET_DELETE_ALERT:        'The selected task will be permanently deleted',

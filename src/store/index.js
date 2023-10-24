@@ -1,18 +1,15 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
+import { createStore } from 'vuex'
 
-import targets      from './modules/targets'        // Список задач | Targets list
-import lang         from './modules/lang.js'        // Язык интерфейса | App language
-import translater   from './modules/translater.js'  // Языковые константы для локализации | Language constants
+import lang from '@/store/modules/lang'
+import translater from '@/store/modules/translater'
+import targets from '@/store/modules/targets'
 
-Vue.use(Vuex) 
-
-export default new Vuex.Store({
+export default createStore({
 
     modules: {
 
-        targets,
         lang,
-        translater
+        translater, 
+        targets
     }
 })

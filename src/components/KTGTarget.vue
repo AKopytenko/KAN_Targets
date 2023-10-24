@@ -23,10 +23,10 @@
                     :aria-controls="'target-' + target.id" 
                     v-if="!updateForm"
                 >
-                        {{ target.name }}
+                    {{ target.name }}
                 </h3>
 
-                <input v-model="target.name" type="text" id="targetUpdateName" class="m-4 form-control target__nameUpdate" v-if="updateForm">
+                <input v-model="targetName" type="text" id="targetUpdateName" class="m-4 form-control target__nameUpdate" v-if="updateForm">
                 
                 <a 
                     href="#" 
@@ -59,11 +59,16 @@
 
                     <div class="form-group target__descr">
                         <span class="target__descrText" v-if="!updateForm" v-html="target.descr.split('\n').join('<br>')"></span>
-                        <textarea v-model="target.descr" id="targetUpdateDescr" class="form-control target__descrUpdate" v-if="updateForm" rows="6"></textarea>
+                        <textarea v-model="targetDescr" id="targetUpdateDescr" class="form-control target__descrUpdate" v-if="updateForm" rows="6"></textarea>
                     </div>
 
                     <div class="form-group form-check target__state my-4" v-if="updateForm">
-                        <input type="checkbox" :checked="target.completed" id="targetUpdateState" class="form-check-input target__stateUpdate">
+                        <input type="checkbox" :checked="targetPriority" id="targetUpdatePriority" class="form-check-input target__priorityUpdate">
+                        <label class="form-check-label" for="targetUpdatePriority">{{ getTranslate.TARGET_PRIORITY }}</label>
+                    </div>
+
+                    <div class="form-group form-check target__state my-4" v-if="updateForm">
+                        <input type="checkbox" :checked="targetCompleted" id="targetUpdateState" class="form-check-input target__stateUpdate">
                         <label class="form-check-label" for="targetUpdateState">{{ getTranslate.TARGET_CLOSED }}</label>
                     </div>
 
@@ -115,7 +120,7 @@ import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 
 export default {
 
-    name: 'Target',
+    name: 'KTGTarget',
 
     props: {
 
@@ -130,8 +135,11 @@ export default {
 
         return {
 
-            updateForm: false,
-            updateFormMsg: null
+            targetName: null,
+            targetDescr: null,
+            targetCompleted: null,
+
+            updateForm: false
         }
     },
     
@@ -164,7 +172,6 @@ export default {
         showUpdateForm(mode) {
 
             this.updateForm = mode
-            this.updateFormMsg = null
         },
 
         sendUpdateTarget(fields) {
@@ -174,7 +181,8 @@ export default {
                 id:         fields.targetID.value,
                 name:       fields.targetUpdateName.value,
                 descr:      fields.targetUpdateDescr.value,
-                completed:  fields.targetUpdateState.checked
+                priority:   fields.targetUpdatePriority.checked ? true : false,
+                completed:  fields.targetUpdateState.checked ? true : false
             }
 
             this.updateTarget(data)
@@ -193,22 +201,32 @@ export default {
             tab.addEventListener('hide.bs.collapse', function () {
 
                 self.showUpdateForm(false)
-                self.setUpdateTargetMsg(null)
+                self.setUpdateTargetMsg({})
             })
         }
+
+        this.targetName = this.target.name
+        this.targetDescr = this.target.descr
+        this.targetCompleted = this.target.completed
+        this.targetPriority = this.target.priority
     },
 
     watch: {
 
-        getUpdateTargetMsg(msg) {
+        updateTargetMsg(msg) {
 
             if(msg.id == this.target.id) {
 
-                this.updateFormMsg = msg
+                this.setUpdateTargetMsg({})
 
                 if(msg.success) {
 
                     this.updateForm = false
+
+                    this.targetName = this.target.name
+                    this.targetDescr = this.target.descr
+                    this.targetCompleted = this.target.completed
+                    this.targetPriority = this.target.priority
                 }
             }
         }
@@ -217,5 +235,5 @@ export default {
 </script>
 
 <style lang="scss">
-@import '@/assets/styles/scss/components/Target.scss';
+@import '@/assets/styles/scss/components/target.scss';
 </style>

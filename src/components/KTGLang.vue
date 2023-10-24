@@ -31,5 +31,5 @@ export default {
 </script>
 
 <style lang="scss">
-@import '@/assets/styles/scss/components/KTGLang';
+@import '@/assets/styles/scss/components/lang';
 </style>
