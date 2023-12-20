@@ -82,6 +82,8 @@ export default {
 
                 state.targetsMsg = { success: false, text: getters.getTranslate.ERROR_TARGETS_READ }
             }
+
+            return state.targets
         },
 
         /**
