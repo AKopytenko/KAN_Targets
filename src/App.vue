@@ -1,15 +1,11 @@
 <template>
-
     <div id="app">
-
         <KTGTargets />
-
     </div>
-
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { useStore } from 'vuex'
 import KTGTargets from './components/KTGTargets.vue'
 
 export default {
@@ -21,21 +17,17 @@ export default {
         KTGTargets
     },
 
-    methods: {
+    setup() {
 
-        ...mapActions([
+        const store = useStore()
 
-            'setLang'
-        ])
-    },
+        const localLang = localStorage.getItem('KTG_LANG')
 
-    mounted() {
+        const setLang = lang => store.dispatch('setLang', lang)
 
-        const appLang = localStorage.getItem('KTG_LANG')
+        if(localLang) {
 
-        if(appLang) {
-
-            this.setLang(appLang)
+            setLang(localLang)
         }
     }
 }
