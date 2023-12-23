@@ -5,7 +5,7 @@
         :class="{ 'target__completed' : target.completed }"
     >
 
-        <form action="/" @submit.prevent="sendUpdateTarget($event.target.elements)" class="ktg-card__body target__form">
+        <form action="/" @submit.prevent="sendUpdateTarget()" class="ktg-card__body target__form">
 
             <div class="target__header" id="headingOne">
 
@@ -44,7 +44,7 @@
 
                 <div class="target__body">
 
-                    <template v-if="updateTargetMsg && updateTargetMsg.id == target.id">
+                    <template v-if="'success' in updateTargetMsg && updateTargetMsg.id == target.id">
                         <div 
                             class="alert alert-dismissible target__message"  
                             :class="{ 
@@ -53,7 +53,7 @@
                             }"
                         >
                             {{ updateTargetMsg.text }}
-                            <button type="button" class="btn-close target__messageClose" data-bs-dismiss="alert" aria-label="Close"></button>
+                            <button type="button" class="btn-close target__messageClose" @click="setUpdateTargetMsg({})"></button>
                         </div>
                     </template>
 
@@ -63,30 +63,30 @@
                     </div>
 
                     <div class="form-group form-check target__state my-4" v-if="updateForm">
-                        <input type="checkbox" :checked="targetPriority" id="targetUpdatePriority" class="form-check-input target__priorityUpdate">
+                        <input type="checkbox" v-model="targetPriority" id="targetUpdatePriority" class="form-check-input target__priorityUpdate">
                         <label class="form-check-label" for="targetUpdatePriority">{{ getTranslate.TARGET_PRIORITY }}</label>
                     </div>
 
                     <div class="form-group form-check target__state my-4" v-if="updateForm">
-                        <input type="checkbox" :checked="targetCompleted" id="targetUpdateState" class="form-check-input target__stateUpdate">
+                        <input type="checkbox" v-model="targetCompleted" id="targetUpdateState" class="form-check-input target__stateUpdate">
                         <label class="form-check-label" for="targetUpdateState">{{ getTranslate.TARGET_CLOSED }}</label>
                     </div>
 
                     <div class="target__footer mt-4 pt-3">
 
                         <div class="target__created">{{ getTranslate.TARGET_DATE }}: {{ new Date(target.created * 1000).toLocaleString() }}</div>
-                        
+
                         <button 
                             class="btn btn-primary target__updateShow" 
                             type="button"
-                            @click.prevent="showUpdateForm(true)" 
+                            @click.prevent="updateForm = true" 
                             v-if="!updateForm"
                         >{{ getTranslate.BTN_EDIT }}</button>
 
                         <button 
                             class="btn btn-light target__updateHide"
                             type="button" 
-                            @click.prevent="showUpdateForm(false)"
+                            @click.prevent="updateForm = false"
                             v-if="updateForm"
                         >{{ getTranslate.BTN_CANCEL }}</button>
 
@@ -116,7 +116,8 @@
 </template>
 
 <script>
-import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
+import { computed, ref, watch } from 'vue'
+import { useStore } from 'vuex'
 
 export default {
 
@@ -126,109 +127,59 @@ export default {
 
         target: {
 
-            required: true,
-            type: Object
+            type: Object,
+            require: true
         }
     },
 
-    data() {
+    setup(props) {
 
-        return {
+        const store = useStore()
 
-            targetName: null,
-            targetDescr: null,
-            targetCompleted: null,
+        const updateTargetMsg       = computed(() => store.state.targets.updateTargetMsg)
+        const getTranslate          = computed(() => store.getters.getTranslate)
+        const updateTarget          = data => store.dispatch('updateTarget', data)
+        const setUpdateTargetMsg    = msg => store.commit('setUpdateTargetMsg', msg)
 
-            updateForm: false
-        }
-    },
-    
-    computed: {
+        let targetId        = ref(props.target.id),
+            targetName      = ref(props.target.name),
+            targetDescr     = ref(props.target.descr),
+            targetCompleted = ref(props.target.completed),
+            targetPriority  = ref(props.target.priority),
+            updateForm      = ref(false)
 
-        ...mapState({
-
-            updateTargetMsg: state => state.targets.updateTargetMsg
-        }),
-
-        ...mapGetters([
-
-            'getTranslate',
-            'getTargets'
-        ])
-    },
-
-    methods: {
-
-        ...mapActions([
-
-            'updateTarget'
-        ]),
-
-        ...mapMutations([
-
-            'setUpdateTargetMsg'
-        ]),
-
-        showUpdateForm(mode) {
-
-            this.updateForm = mode
-        },
-
-        sendUpdateTarget(fields) {
+        function sendUpdateTarget() {
 
             const data = {
 
-                id:         fields.targetID.value,
-                name:       fields.targetUpdateName.value,
-                descr:      fields.targetUpdateDescr.value,
-                priority:   fields.targetUpdatePriority.checked ? true : false,
-                completed:  fields.targetUpdateState.checked ? true : false
+                id:         targetId.value,
+                name:       targetName.value,
+                descr:      targetDescr.value,
+                completed:  targetCompleted.value,
+                priority:   targetPriority.value
             }
 
-            this.updateTarget(data)
-        }
-    },
-
-    mounted() {
-
-        const self = this
-        const targetsTabs = document.getElementsByClassName('target__content')
-
-        self.showUpdateForm(false)
-
-        for(let tab of targetsTabs) {
-
-            tab.addEventListener('hide.bs.collapse', function () {
-
-                self.showUpdateForm(false)
-                self.setUpdateTargetMsg({})
-            })
+            updateTarget(data)
         }
 
-        this.targetName = this.target.name
-        this.targetDescr = this.target.descr
-        this.targetCompleted = this.target.completed
-        this.targetPriority = this.target.priority
-    },
+        watch(updateTargetMsg, async msg => {
 
-    watch: {
+            if(msg.success) updateForm.value = false
+        })
 
-        updateTargetMsg(msg) {
+        return {
 
-            if(msg.id == this.target.id) {
-
-                this.setUpdateTargetMsg({})
-
-                if(msg.success) {
-
-                    this.updateForm = false
-
-                    this.targetName = this.target.name
-                    this.targetDescr = this.target.descr
-                    this.targetCompleted = this.target.completed
-                    this.targetPriority = this.target.priority
-                }
-            }
+            updateTargetMsg,
+            getTranslate,
+            updateTarget,
+            setUpdateTargetMsg,
+            targetId,
+            targetName,
+            targetDescr,
+            targetCompleted,
+            targetPriority,
+            updateForm,
+            sendUpdateTarget
         }
     }
 }

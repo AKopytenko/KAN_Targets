@@ -3,11 +3,12 @@ export default {
     state: {
 
         targets:            [],
-        targetsMsg:         null,
-        createTargetMsg:    null,
-        updateTargetMsg:    null,
-        deleteTargetMsg:    null
+        targetsMsg:         {},
+        createTargetMsg:    {},
+        updateTargetMsg:    {},
+        deleteTargetMsg:    {}
     },
+
     getters: {
 
         getTargets:         state => state.targets,
@@ -15,6 +16,7 @@ export default {
         getUpdateTargetMsg: state => state.updateTargetMsg,
         getDeleteTargetMsg: state => state.deleteTargetMsg
     },
+
     actions: {
 
         /**
