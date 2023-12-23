@@ -6,26 +6,25 @@
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex'
+import { computed } from 'vue'
+import { useStore } from 'vuex'
 
 export default {
 
     name: 'KTGLang',
 
-    computed: {
+    setup() {
 
-        ...mapState({
+        const store = useStore()
 
-            lang: state => state.lang.lang
-        })
-    },
+        const lang = computed(() => store.state.lang.lang)
+        const setLang = data => store.dispatch('setLang', data)
 
-    methods: {
+        return {
 
-        ...mapActions([
-
-            'setLang'
-        ])
+            lang,
+            setLang
+        }
     }
 }
 </script>
