@@ -10,13 +10,19 @@
                         <h5 class="modal-title">{{ getTranslate.TARGET_NEW_HEADER }}</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <form class="ktg-createTarget__form" action="/" method="post" @submit.prevent="sendTargetForm($event)" id="createTargetForm">
+                    <form class="ktg-createTarget__form" action="/" method="post" @submit.prevent="sendTargetForm()" id="createTargetForm">
                         <div class="modal-body">
-                            <div class="mb-3 ktg-createTarget__result" v-if="getCreateTargetMsg">
-                                <div class="alert alert-success" v-if="getCreateTargetMsg.success">{{ getCreateTargetMsg.text }}</div>
-                                <div class="alert alert-danger" v-if="getCreateTargetMsg.error">{{ getCreateTargetMsg.text }}</div>
+                            <div 
+                                v-if="'success' in createTargetMsg"
+                                class="mb-3 alert ktg-createTarget__message"
+                                :class="{
+                                    'alert-success' : createTargetMsg.success,
+                                    'alert-danger' : !createTargetMsg.success
+                                }"
+                            >
+                                {{ createTargetMsg.text }}
                             </div>
-                            <div class="ktg-createTarget__error" v-if="formErrors.length">
+                            <div class="mb-3 ktg-createTarget__message" v-if="formErrors.length">
                                 <div class="alert alert-danger">
                                     <div v-for="error in formErrors" :key="error">
                                         {{ error }}
@@ -27,26 +33,31 @@
                                 <label for="targetName">{{ getTranslate.TARGET_NEW_NAME }}</label>
                                 <input 
                                     type="text" 
-                                    class="form-control" 
                                     id="targetName" 
-                                    aria-describedby="targetNameHelp"
+                                    class="form-control" 
                                     :class="{ 'is-invalid': 'targetName' in invalidFields }" 
+                                    v-model="targetName"
                                     @change="checkValid($event)"
                                 >
                             </div>
                             <div class="mb-3 ktg-createTarget__formform-group">
                                 <label for="targetDescr">{{ getTranslate.TARGET_NEW_TEXT }}</label>
                                 <textarea 
-                                    class="form-control" 
                                     id="targetDescr" 
-                                    rows="5" 
-                                    aria-describedby="targetDescrHelp"
+                                    class="form-control" 
                                     :class="{ 'is-invalid': 'targetDescr' in invalidFields }" 
+                                    v-model="targetDescr"
+                                    rows="5" 
                                     @change="checkValid($event)"
                                 ></textarea>
                             </div>
                             <div class="form-check ktg-createTarget__formform-group">
-                                <input type="checkbox" class="form-check-input" id="targetPriority" aria-describedby="targetPriorityHelp">
+                                <input 
+                                    type="checkbox" 
+                                    id="targetPriority"
+                                    class="form-check-input" 
+                                    v-model="targetPriority"
+                                >
                                 <label class="form-check-label" for="targetPriority">{{ getTranslate.TARGET_NEW_PRIORITY }}</label>
                             </div>
                         </div>
@@ -63,112 +74,108 @@
 </template>
 
 <script>
-
-import { mapGetters, mapActions, mapMutations } from 'vuex'
+import { ref, computed, watch } from 'vue'
+import { useStore } from 'vuex'
 
 export default {
 
     name: 'KTGCreateTarget.vue',
 
-    data() {
+    setup() {
 
-        return {
+        const store = useStore()
 
-            invalidFields: {},
-            formErrors: [],
+        const createTargetMsg       = computed(() => store.state.targets.createTargetMsg)
+        const getTranslate          = computed(() => store.getters.getTranslate)
+        const createTarget          = data => store.dispatch('createTarget', data)
+        const setCreateTargetMsg    = msg => store.commit('setCreateTargetMsg', msg)
 
-            modalShow: false
-        }
-    },
+        let targetName      = ref(''),
+            targetDescr     = ref(''),
+            targetPriority  = ref(false),
+            invalidFields   = ref({}),
+            formErrors      = ref([]),
+            modalShow       = ref(false)
 
-    computed: {
+        const sendTargetForm = () => {
 
-        ...mapGetters([
-
-            'getTranslate',
-            'getTargets', 
-            'getCreateTargetMsg'
-        ])
-    },
-
-    methods: {
-
-        ...mapActions([
-
-            'createTarget'
-        ]),
-
-        ...mapMutations([
-
-            'setCreateTargetMsg'
-        ]),
-
-        sendTargetForm(event) {
-
-            const fields = event.target.elements
-
-            this.invalidFields = {}
-            this.formErrors = []
-            this.setCreateTargetMsg(null)
+            invalidFields.value = {}
+            formErrors.value = []
+            setCreateTargetMsg({})
 
             let data = {}
 
-            if(fields.targetName.value) {
+            if(targetName.value) {
 
-                data.name = fields.targetName.value
-
-            } else {
-
-                this.invalidFields.targetName = true
-                this.formErrors.push(this.getTranslate.ERROR_TARGET_TITLE)
-            }
-
-            if(fields.targetDescr.value) {
-
-                data.descr = fields.targetDescr.value
+                data.name = targetName.value
 
             } else {
 
-                this.invalidFields.targetDescr = true
-                this.formErrors.push(this.getTranslate.ERROR_TARGET_TEXT)
+                invalidFields.value.targetName = true
+                formErrors.value.push(getTranslate.value.ERROR_TARGET_TITLE)
             }
 
-            data.priority = fields.targetPriority.checked || false
+            if(targetDescr.value) {
+
+                data.descr = targetDescr.value
+
+            } else {
+
+                invalidFields.value.targetDescr = true
+                formErrors.value.push(getTranslate.value.ERROR_TARGET_TEXT)
+            }
+
+            data.priority = targetPriority.value.checked || false
             data.created = (Date.now() / 1000).toFixed()
 
-            if(this.formErrors.length == 0) {
+            if(formErrors.value.length == 0) {
 
-                this.createTarget(data)
+                createTarget(data)
             }
-        },
+        }
 
-        checkValid(event) {
+        const checkValid = event => {
 
             event.target.classList.remove('is-invalid')
         }
-    },
 
-    mounted() {
+        watch(createTargetMsg, async msg => {
 
-        const self = this
-        const createTargetModal = document.getElementById('createTargetModal')
+            if('success' in msg && msg.success) {
 
-        createTargetModal.addEventListener('show.bs.modal', function () {
-
-            self.invalidFields = {}
-            self.formErrors = []
-            self.setCreateTargetMsg(null)
-        })
-    },
-
-    watch: {
-
-        getCreateTargetMsg(msg) {
-
-            if(msg && msg.success) {
-
-                document.querySelector('#createTargetForm').reset()
+                targetName.value        = '',
+                targetDescr.value       = '',
+                targetPriority.value    = false,
+                modalShow.value         = false
             }
+        })
+
+        watch(modalShow, async () => {
+
+            if(!modalShow.value) {
+
+                targetName.value      = ''
+                targetDescr.value     = ''
+                targetPriority.value  = false
+
+                setCreateTargetMsg({})
+            }
+        })
+
+        return {
+
+            createTargetMsg,
+            getTranslate, 
+            invalidFields, 
+            formErrors, 
+            modalShow,
+            createTarget,
+            setCreateTargetMsg,
+            targetName,
+            targetDescr,
+            targetPriority,
+            sendTargetForm,
+            checkValid
         }
     }
 }

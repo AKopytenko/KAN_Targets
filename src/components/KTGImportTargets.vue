@@ -11,7 +11,7 @@
                 <button 
                     type="button"
                     class="btn btn-primary mr-2 ktg-import__download"
-                    :disabled="!getTargets.length"
+                    :disabled="!storeTargets.length"
                     @click.prevent="downloadTargets()"
                 >
                     {{ getTranslate.BTN_DOWNLOAD }}
@@ -23,7 +23,7 @@
                     data-bs-toggle="modal" 
                     data-bs-target="#importTargetsModal" 
                     aria-hidden="true"
-                    @click.prevent="importTargetsMsg = null"
+                    @click.prevent="importTargetsMsg = {}"
                 >
                     {{ getTranslate.BTN_UPLOAD }}
                 </button>
@@ -41,7 +41,7 @@
                     </div>
                     <form class="ktg-import__modalForm" action="/" method="post" id="importTargetsForm" @submit.prevent="uploadTargets($event)">
                         <div class="modal-body ktg-import__modalBody">
-                            <div class="ktg-import__result" v-if="importTargetsMsg">
+                            <div class="ktg-import__result" v-if="'success' in importTargetsMsg">
                                 <div 
                                     class="alert"
                                     :class="{
@@ -65,7 +65,7 @@
                                     id="importTargetsMethod" 
                                     class="form-select ktg-import__formInput"
                                     :class="{ 'is-invalid': 'importTargetsMethod' in invalidFields }" 
-                                    @change="checkValid($event)"
+                                    @change="$event.target.classList.remove('is-invalid')"
                                 >
                                     <option value="" selected disabled>...</option>
                                     <option value="push">{{ getTranslate.IMPORT_ADD }}</option>
@@ -90,7 +90,7 @@
                                     class="form-control ktg-import__formInput" 
                                     accept=".txt"
                                     :class="{ 'is-invalid': 'importTargetsFile' in invalidFields }" 
-                                    @change="checkValid($event)"
+                                    @change="$event.target.classList.remove('is-invalid')"
                                 >
                             </div>
                         </div>
@@ -106,41 +106,28 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations } from 'vuex'
+import { ref, computed, onMounted } from 'vue'
+import { useStore } from 'vuex'
 
 export default {
 
     name: 'KTGImportTargets',
 
-    data() {
+    setup() {
 
-        return {
+        const store = useStore()
 
-            invalidFields: {},
-            formErrors: [],
-            importTargetsMsg: null
-        }
-    },
+        let invalidFields     = ref({}),
+            formErrors        = ref([]),
+            importTargetsMsg  = ref({})
 
-    computed: {
+        const storeTargets  = computed(() => store.state.targets.targets)
+        const getTranslate  = computed(() => store.getters.getTranslate)
+        const setTargets    = msg => store.commit('setTargets', msg)
 
-        ...mapGetters([
+        function downloadTargets(targets) {
 
-            'getTranslate',
-            'getTargets'
-        ])
-    },
-
-    methods: {
-
-        ...mapMutations([
-
-            'setTargets'
-        ]),
-
-        downloadTargets() {
-
-            const targetsString = JSON.stringify(this.getTargets)
+            const targetsString = JSON.stringify(targets)
             const targetsFile = new Blob( [ targetsString ], {type: 'application/json'})
             
             let now     = new Date(),
@@ -156,27 +143,27 @@ export default {
             a.href = URL.createObjectURL(targetsFile)
             a.download = 'KANTargetsImport__' + year + '-' + month + '-' + day + '_' + hours + '-' + minutes + '-' + seconds + '.txt'
             a.click()
-        },
+        }
 
-        async uploadTargets(event) {
+        function uploadTargets(event) {
 
             const self = this
             const fields = event.target.elements
 
             let data = {}
 
-            this.invalidFields = {}
-            this.formErrors = []
+            invalidFields.value = {}
+            formErrors.value = []
 
             if(fields.importTargetsMethod.value) {
                 data.method = fields.importTargetsMethod.value
             } else {
-                this.invalidFields.importTargetsMethod = true
-                this.formErrors.push(this.getTranslate.ERROR_IMPORT_METHOD)
+                invalidFields.value.importTargetsMethod = true
+                formErrors.value.push(this.getTranslate.ERROR_IMPORT_METHOD)
             }
 
             if(fields.importTargetsFile.value) {
-                
+
                 let file     = fields.importTargetsFile.files[0],
                     fileType = file.type,
                     fileExt  = file.name.split('.')[1]
@@ -184,19 +171,21 @@ export default {
                 if( fileType == 'text/plain' || fileExt == 'txt' ) {
                     data.file = fields.importTargetsFile.files[0]
                 } else {
-                    this.invalidFields.importTargetsFile = true
-                    this.formErrors.push(this.getTranslate.ERROR_IMPORT_FILE_FORMAT)
+                    invalidFields.value.importTargetsFile = true
+                    formErrors.value.push(this.getTranslate.ERROR_IMPORT_FILE_FORMAT)
                 }
             } else {
-                this.invalidFields.importTargetsFile = true
-                this.formErrors.push(this.getTranslate.ERROR_IMPORT_FILE)
+                console.log(1)
+                invalidFields.value.importTargetsFile = true
+                console.log(2)
+                formErrors.value.push(this.getTranslate.ERROR_IMPORT_FILE)
             }
 
-            if(this.formErrors.length == 0) {
+            if(formErrors.value.length == 0) {
 
                 const reader = new FileReader()
 
-                let targets = []
+                let newTargets = []
 
                 switch( data.method ) {
 
@@ -219,10 +208,8 @@ export default {
                                         'priority'  in target && 
                                         'created'   in target 
                                     ) {
-                                        
-                                        console.log('rewrite - Формат: ОК')
 
-                                        targets.push({
+                                        newTargets.push({
                                             
                                             id:         target.id,
                                             name:       target.name,
@@ -232,23 +219,21 @@ export default {
                                         })
 
                                     } else {
-                                        
-                                        console.log('rewrite - Формат: FAIL', target)
 
-                                        self.importTargetsMsg = { success: false, text: self.getTranslate.ERROR_IMPORT_FILE_FORMAT }
+                                        importTargetsMsg = { success: false, text: self.getTranslate.ERROR_IMPORT_FILE_FORMAT }
                                         return false
                                     }
                                 }
 
                             } catch {
 
-                                self.importTargetsMsg = { success: false, text: self.getTranslate.ERROR_IMPORT_FILE_FORMAT }
+                                importTargetsMsg = { success: false, text: self.getTranslate.ERROR_IMPORT_FILE_FORMAT }
                                 return false
                             }
 
-                            self.setTargets(targets)
+                            self.setTargets(newTargets)
 
-                            self.importTargetsMsg = { success: true, text: self.getTranslate.IMPORT_SUCCESS }
+                            importTargetsMsg = { success: true, text: self.getTranslate.IMPORT_SUCCESS }
                         }
 
                         break
@@ -265,9 +250,9 @@ export default {
 
                                 let targetID = 0
 
-                                if(self.getTargets.length) {
+                                if(storeTargets.value.length) {
 
-                                    const allIDs = self.getTargets.map( target => target.id )
+                                    const allIDs = storeTargets.value.map( target => target.id )
 
                                     targetID = Math.max.apply(null, allIDs) + 1
                                 }
@@ -284,7 +269,7 @@ export default {
                                         
                                         console.log('push - Формат: ОК')
 
-                                        targets.push({
+                                        newTargets.push({
 
                                             id: targetID, 
                                             name: target.name,
@@ -299,48 +284,54 @@ export default {
 
                                         console.log('push - Формат: FAIL', target)
 
-                                        self.importTargetsMsg = { success: false, text: self.getTranslate.ERROR_IMPORT_FILE_FORMAT }
+                                        importTargetsMsg = { success: false, text: self.getTranslate.ERROR_IMPORT_FILE_FORMAT }
                                         return false
                                     }
                                 }
 
                             } catch {
 
-                                self.importTargetsMsg = { success: false, text: self.getTranslate.ERROR_IMPORT_FILE_FORMAT }
+                                importTargetsMsg = { success: false, text: self.getTranslate.ERROR_IMPORT_FILE_FORMAT }
                                 return false
                             }
 
-                            targets = [...self.getTargets, ...targets]
+                            newTargets = [...storeTargets.value, ...newTargets]
 
-                            self.setTargets(targets)
+                            self.setTargets(newTargets)
 
-                            self.importTargetsMsg = { success: true, text: self.getTranslate.IMPORT_SUCCESS }
+                            importTargetsMsg = { success: true, text: self.getTranslate.IMPORT_SUCCESS }
                         }
 
                         break
                 }
 
             }
-        },
-
-        checkValid(event) {
-
-            event.target.classList.remove('is-invalid')
         }
-    },
 
-    mounted() {
+        onMounted(() => {
 
-        const self = this
-        const importTargetsModal = document.getElementById('importTargetsModal')
+            const importTargetsModal = document.getElementById('importTargetsModal')
 
-        importTargetsModal.addEventListener('show.bs.modal', function () {
+            importTargetsModal.addEventListener('show.bs.modal', () => {
 
-            self.formErrors = []
-            self.invalidFields = {}
-            self.importTargetsMsg = null
-            document.querySelector('#importTargetsForm').reset()
+                formErrors.value = []
+                invalidFields.value = {}
+                importTargetsMsg.value = {}
+                document.querySelector('#importTargetsForm').reset()
+            })
         })
+
+        return {
+
+            invalidFields,
+            formErrors,
+            importTargetsMsg,
+            storeTargets,
+            getTranslate,
+            setTargets,
+            downloadTargets,
+            uploadTargets
+        }
     }
 }
 </script>
