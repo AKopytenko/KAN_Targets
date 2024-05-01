@@ -46,7 +46,7 @@
                 {{ getTranslate.TARGETS_EMPTY }}
             </div>
 
-            <KTGImportTargets v-if="targets.value.length" />
+            <KTGImportTargets />
 
         </div>
 
