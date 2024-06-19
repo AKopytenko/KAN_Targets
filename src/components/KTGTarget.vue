@@ -115,74 +115,52 @@
 
 </template>
 
-<script>
+<script setup>
 import { computed, ref, watch } from 'vue'
 import { useStore } from 'vuex'
 
-export default {
+const props = defineProps({
 
-    name: 'KTGTarget',
+    target: {
 
-    props: {
-
-        target: {
-
-            type: Object,
-            require: true
-        }
-    },
-
-    setup(props) {
-
-        const store = useStore()
-
-        const updateTargetMsg       = computed(() => store.state.targets.updateTargetMsg)
-        const getTranslate          = computed(() => store.getters.getTranslate)
-        const updateTarget          = data => store.dispatch('updateTarget', data)
-        const setUpdateTargetMsg    = msg => store.commit('setUpdateTargetMsg', msg)
-
-        let targetId        = ref(props.target.id),
-            targetName      = ref(props.target.name),
-            targetDescr     = ref(props.target.descr),
-            targetCompleted = ref(props.target.completed),
-            targetPriority  = ref(props.target.priority),
-            updateForm      = ref(false)
-
-        function sendUpdateTarget() {
-
-            const data = {
-
-                id:         targetId.value,
-                name:       targetName.value,
-                descr:      targetDescr.value,
-                completed:  targetCompleted.value,
-                priority:   targetPriority.value
-            }
-
-            updateTarget(data)
-        }
-
-        watch(updateTargetMsg, async msg => {
-
-            if(msg.success) updateForm.value = false
-        })
-
-        return {
-
-            updateTargetMsg,
-            getTranslate,
-            updateTarget,
-            setUpdateTargetMsg,
-            targetId,
-            targetName,
-            targetDescr,
-            targetCompleted,
-            targetPriority,
-            updateForm,
-            sendUpdateTarget
-        }
+        type: Object, 
+        required: true
     }
+})
+
+const store = useStore()
+
+const updateTargetMsg       = computed(() => store.state.targets.updateTargetMsg)
+const getTranslate          = computed(() => store.getters.getTranslate)
+const updateTarget          = data => store.dispatch('updateTarget', data)
+const setUpdateTargetMsg    = msg => store.commit('setUpdateTargetMsg', msg)
+
+let targetId        = ref(props.target.id),
+    targetName      = ref(props.target.name),
+    targetDescr     = ref(props.target.descr),
+    targetCompleted = ref(props.target.completed),
+    targetPriority  = ref(props.target.priority),
+    updateForm      = ref(false)
+
+function sendUpdateTarget() {
+
+    const data = {
+
+        id:         targetId.value,
+        name:       targetName.value,
+        descr:      targetDescr.value,
+        completed:  targetCompleted.value,
+        priority:   targetPriority.value
+    }
+
+    updateTarget(data)
 }
+
+watch(updateTargetMsg, async msg => {
+
+    if(msg.success) updateForm.value = false
+})
+
 </script>
 
 <style lang="scss">

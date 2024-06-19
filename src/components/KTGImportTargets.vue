@@ -105,235 +105,209 @@
     </div>
 </template>
 
-<script>
+<script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useStore } from 'vuex'
 
-export default {
+const store = useStore()
 
-    name: 'KTGImportTargets',
+let invalidFields     = ref({}),
+    formErrors        = ref([]),
+    importTargetsMsg  = ref({})
 
-    setup() {
+const storeTargets  = computed(() => store.state.targets.targets)
+const getTranslate  = computed(() => store.getters.getTranslate)
+const setTargets    = msg => store.commit('setTargets', msg)
 
-        const store = useStore()
+function downloadTargets() {
 
-        let invalidFields     = ref({}),
-            formErrors        = ref([]),
-            importTargetsMsg  = ref({})
+    const targetsString = JSON.stringify(storeTargets.value)
+    const targetsFile = new Blob( [ targetsString ], {type: 'application/json'})
+    
+    let now     = new Date(),
+        year    = now.getFullYear(),
+        month   = ('0' + (Number(now.getMonth()) + 1)).slice(-2),
+        day     = ('0' + now.getDate()).slice(-2),
+        hours   = ('0' + now.getHours()).slice(-2),
+        minutes = ('0' + now.getMinutes()).slice(-2),
+        seconds = ('0' + now.getSeconds()).slice(-2)
 
-        const storeTargets  = computed(() => store.state.targets.targets)
-        const getTranslate  = computed(() => store.getters.getTranslate)
-        const setTargets    = msg => store.commit('setTargets', msg)
+    let a = document.createElement('a')
 
-        function downloadTargets(targets) {
+    a.href = URL.createObjectURL(targetsFile)
+    a.download = 'KANTargetsImport__' + year + '-' + month + '-' + day + '_' + hours + '-' + minutes + '-' + seconds + '.txt'
+    a.click()
+}
 
-            const targetsString = JSON.stringify(targets)
-            const targetsFile = new Blob( [ targetsString ], {type: 'application/json'})
-            
-            let now     = new Date(),
-                year    = now.getFullYear(),
-                month   = ('0' + (Number(now.getMonth()) + 1)).slice(-2),
-                day     = ('0' + now.getDate()).slice(-2),
-                hours   = ('0' + now.getHours()).slice(-2),
-                minutes = ('0' + now.getMinutes()).slice(-2),
-                seconds = ('0' + now.getSeconds()).slice(-2)
+function uploadTargets(event) {
 
-            let a = document.createElement('a')
+    const fields = event.target.elements
 
-            a.href = URL.createObjectURL(targetsFile)
-            a.download = 'KANTargetsImport__' + year + '-' + month + '-' + day + '_' + hours + '-' + minutes + '-' + seconds + '.txt'
-            a.click()
+    let data = {}
+
+    invalidFields.value = {}
+    formErrors.value = []
+
+    if(fields.importTargetsMethod.value) {
+        data.method = fields.importTargetsMethod.value
+    } else {
+        invalidFields.value.importTargetsMethod = true
+        formErrors.value.push(getTranslate.value.ERROR_IMPORT_METHOD)
+    }
+
+    if(fields.importTargetsFile.value) {
+
+        let file     = fields.importTargetsFile.files[0],
+            fileType = file.type,
+            fileExt  = file.name.split('.')[1]
+
+        if( fileType == 'text/plain' || fileExt == 'txt' ) {
+            data.file = fields.importTargetsFile.files[0]
+        } else {
+            invalidFields.value.importTargetsFile = true
+            formErrors.value.push(getTranslate.value.ERROR_IMPORT_FILE_FORMAT)
         }
+    } else {
+        invalidFields.value.importTargetsFile = true
+        formErrors.value.push(getTranslate.value.ERROR_IMPORT_FILE)
+    }
 
-        function uploadTargets(event) {
+    if(formErrors.value.length == 0) {
 
-            const self = this
-            const fields = event.target.elements
+        const reader = new FileReader()
 
-            let data = {}
+        let newTargets = []
 
-            invalidFields.value = {}
-            formErrors.value = []
+        switch( data.method ) {
 
-            if(fields.importTargetsMethod.value) {
-                data.method = fields.importTargetsMethod.value
-            } else {
-                invalidFields.value.importTargetsMethod = true
-                formErrors.value.push(this.getTranslate.ERROR_IMPORT_METHOD)
-            }
+            case 'rewrite':
 
-            if(fields.importTargetsFile.value) {
+                reader.readAsText(data.file)
 
-                let file     = fields.importTargetsFile.files[0],
-                    fileType = file.type,
-                    fileExt  = file.name.split('.')[1]
+                reader.onload = function(event) {
 
-                if( fileType == 'text/plain' || fileExt == 'txt' ) {
-                    data.file = fields.importTargetsFile.files[0]
-                } else {
-                    invalidFields.value.importTargetsFile = true
-                    formErrors.value.push(this.getTranslate.ERROR_IMPORT_FILE_FORMAT)
-                }
-            } else {
-                console.log(1)
-                invalidFields.value.importTargetsFile = true
-                console.log(2)
-                formErrors.value.push(this.getTranslate.ERROR_IMPORT_FILE)
-            }
+                    try {
 
-            if(formErrors.value.length == 0) {
+                        const fileContent = JSON.parse(event.target.result)
 
-                const reader = new FileReader()
+                        for(let target of fileContent) {
 
-                let newTargets = []
+                            if( 
+                                'id'        in target &&
+                                'name'      in target && 
+                                'descr'     in target && 
+                                'priority'  in target && 
+                                'created'   in target 
+                            ) {
 
-                switch( data.method ) {
+                                newTargets.push({
+                                    
+                                    id:         target.id,
+                                    name:       target.name,
+                                    descr:      target.descr,
+                                    priority:   target.priority,
+                                    created:    target.created
+                                })
 
-                    case 'rewrite':
+                            } else {
 
-                        reader.readAsText(data.file)
-
-                        reader.onload = function(event) {
-
-                            try {
-
-                                const fileContent = JSON.parse(event.target.result)
-
-                                for(let target of fileContent) {
-
-                                    if( 
-                                        'id'        in target &&
-                                        'name'      in target && 
-                                        'descr'     in target && 
-                                        'priority'  in target && 
-                                        'created'   in target 
-                                    ) {
-
-                                        newTargets.push({
-                                            
-                                            id:         target.id,
-                                            name:       target.name,
-                                            descr:      target.descr,
-                                            priority:   target.priority,
-                                            created:    target.created
-                                        })
-
-                                    } else {
-
-                                        importTargetsMsg = { success: false, text: self.getTranslate.ERROR_IMPORT_FILE_FORMAT }
-                                        return false
-                                    }
-                                }
-
-                            } catch {
-
-                                importTargetsMsg = { success: false, text: self.getTranslate.ERROR_IMPORT_FILE_FORMAT }
+                                importTargetsMsg = { success: false, text: getTranslate.value.ERROR_IMPORT_FILE_FORMAT }
                                 return false
                             }
-
-                            self.setTargets(newTargets)
-
-                            importTargetsMsg = { success: true, text: self.getTranslate.IMPORT_SUCCESS }
                         }
 
-                        break
+                    } catch {
 
-                    case 'push':
+                        importTargetsMsg = { success: false, text: getTranslate.value.ERROR_IMPORT_FILE_FORMAT }
+                        return false
+                    }
 
-                        reader.readAsText(data.file)
+                    setTargets(newTargets)
 
-                        reader.onload = function(event) {
-
-                            try {
-
-                                const fileContent = JSON.parse(event.target.result)
-
-                                let targetID = 0
-
-                                if(storeTargets.value.length) {
-
-                                    const allIDs = storeTargets.value.map( target => target.id )
-
-                                    targetID = Math.max.apply(null, allIDs) + 1
-                                }
-
-                                for(let target of fileContent) {
-
-                                    if(
-                                        'id'        in target && 
-                                        'name'      in target && 
-                                        'descr'     in target && 
-                                        'priority'  in target && 
-                                        'created'   in target
-                                    ) {
-                                        
-                                        console.log('push - Формат: ОК')
-
-                                        newTargets.push({
-
-                                            id: targetID, 
-                                            name: target.name,
-                                            descr: target.descr,
-                                            priority: target.priority,
-                                            created: target.created
-                                        })
-
-                                        targetID++
-
-                                    } else {
-
-                                        console.log('push - Формат: FAIL', target)
-
-                                        importTargetsMsg = { success: false, text: self.getTranslate.ERROR_IMPORT_FILE_FORMAT }
-                                        return false
-                                    }
-                                }
-
-                            } catch {
-
-                                importTargetsMsg = { success: false, text: self.getTranslate.ERROR_IMPORT_FILE_FORMAT }
-                                return false
-                            }
-
-                            newTargets = [...storeTargets.value, ...newTargets]
-
-                            self.setTargets(newTargets)
-
-                            importTargetsMsg = { success: true, text: self.getTranslate.IMPORT_SUCCESS }
-                        }
-
-                        break
+                    importTargetsMsg = { success: true, text: getTranslate.value.IMPORT_SUCCESS }
                 }
 
-            }
+                break
+
+            case 'push':
+
+                reader.readAsText(data.file)
+
+                reader.onload = function(event) {
+
+                    try {
+
+                        const fileContent = JSON.parse(event.target.result)
+
+                        let targetID = 0
+
+                        if(storeTargets.value.length) {
+
+                            const allIDs = storeTargets.value.map( target => target.id )
+
+                            targetID = Math.max.apply(null, allIDs) + 1
+                        }
+
+                        for(let target of fileContent) {
+
+                            if(
+                                'id'        in target && 
+                                'name'      in target && 
+                                'descr'     in target && 
+                                'priority'  in target && 
+                                'created'   in target
+                            ) {
+
+                                newTargets.push({
+
+                                    id: targetID, 
+                                    name: target.name,
+                                    descr: target.descr,
+                                    priority: target.priority,
+                                    created: target.created
+                                })
+
+                                targetID++
+
+                            } else {
+
+                                importTargetsMsg = { success: false, text: getTranslate.value.ERROR_IMPORT_FILE_FORMAT }
+                                return false
+                            }
+                        }
+
+                    } catch {
+
+                        importTargetsMsg = { success: false, text: getTranslate.value.ERROR_IMPORT_FILE_FORMAT }
+                        return false
+                    }
+
+                    newTargets = [...storeTargets.value, ...newTargets]
+
+                    setTargets(newTargets)
+
+                    importTargetsMsg = { success: true, text: getTranslate.value.IMPORT_SUCCESS }
+                }
+
+                break
         }
 
-        onMounted(() => {
-
-            const importTargetsModal = document.getElementById('importTargetsModal')
-
-            importTargetsModal.addEventListener('show.bs.modal', () => {
-
-                formErrors.value = []
-                invalidFields.value = {}
-                importTargetsMsg.value = {}
-                document.querySelector('#importTargetsForm').reset()
-            })
-        })
-
-        return {
-
-            invalidFields,
-            formErrors,
-            importTargetsMsg,
-            storeTargets,
-            getTranslate,
-            setTargets,
-            downloadTargets,
-            uploadTargets
-        }
     }
 }
+
+onMounted(() => {
+
+    const importTargetsModal = document.getElementById('importTargetsModal')
+
+    importTargetsModal.addEventListener('show.bs.modal', () => {
+
+        formErrors.value = []
+        invalidFields.value = {}
+        importTargetsMsg.value = {}
+        document.querySelector('#importTargetsForm').reset()
+    })
+})
+
 </script>
 
 <style lang="scss">
