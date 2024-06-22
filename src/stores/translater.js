@@ -1,6 +1,6 @@
 import {computed} from 'vue'
 import { defineStore } from 'pinia'
-import { useLangStore } from '@/store/lang'
+import { useLangStore } from '@/stores/lang'
 
 export const useTranslaterStore = defineStore('translater', () => {
 

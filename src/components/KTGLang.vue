@@ -6,13 +6,12 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { useStore } from 'vuex'
+import { useLangStore } from '@/stores/lang'
 
-const store = useStore()
+const langStore = useLangStore()
 
-const lang = computed(() => store.state.lang.lang)
-const setLang = data => store.dispatch('setLang', data)
+const lang = langStore.lang
+const setLang = data => langStore.setLang(data)
 
 </script>
 

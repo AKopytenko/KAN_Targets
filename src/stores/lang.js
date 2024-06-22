@@ -5,17 +5,10 @@ export const useLangStore = defineStore('lang', () => {
 
     const lang = ref('RU')
 
-    const setLang = payload => {
+    function setLang(payload) {
 
-        try {
-
-            localStorage.setItem('KTG_LANG', payload)
-            lang.value = payload
-
-        } catch {
-
-            lang.value = 'RU'
-        }
+        localStorage.setItem('KTG_LANG', payload)
+        lang.value = payload
     }
 
     return {

@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
-import { useTranslaterStore } from '@/store/translater'
+import { useTranslaterStore } from '@/stores/translater'
 
 export const useTargetsStore = defineStore('targets', () => {
 
@@ -27,15 +27,15 @@ export const useTargetsStore = defineStore('targets', () => {
             created:    targetData.created
         }
 
-        if(this.targets.length) {
+        if(targets.value.length) {
 
-            this.targets.sort((a, b) => {
+            targets.value.sort((a, b) => {
                 if (a.id > b.id) return 1
                 if (a.id < b.id) return -1
                 return 0
             })
 
-            const lastTarget = this.targets[this.targets.length - 1] // Последний элемент массива
+            const lastTarget = targets[targets.value.length - 1] // Последний элемент массива
             createTarget.id = Number(lastTarget.id) + 1
 
         } else {
@@ -45,9 +45,9 @@ export const useTargetsStore = defineStore('targets', () => {
 
         try {
 
-            this.targets.push(createTarget)
+            targets.value.push(createTarget)
 
-            localStorage.setItem('KTG_LIST', JSON.stringify(this.targets))
+            localStorage.setItem('KTG_LIST', JSON.stringify(targets.value))
 
             createTargetMsg.value = { success: true, text: translater.getTranslate.TARGET_NEW_SUCCESS }
 
@@ -66,7 +66,7 @@ export const useTargetsStore = defineStore('targets', () => {
 
         try {
 
-            this.targets.map( target => {
+            targets.value.map( target => {
 
                 if(target.id == data.id) {
 
@@ -78,7 +78,7 @@ export const useTargetsStore = defineStore('targets', () => {
             })
 
             localStorage.removeItem('KTG_LIST')
-            localStorage.setItem('KTG_LIST', JSON.stringify(this.targets))
+            localStorage.setItem('KTG_LIST', JSON.stringify(targets.value))
 
             updateTargetMsg = { success: true, text: translater.getTranslate.TARGET_UPDATE_SUCCESS, id: data.id }
 
@@ -88,9 +88,26 @@ export const useTargetsStore = defineStore('targets', () => {
         }
     }
 
-    const deleteTarget = () => {
+    const deleteTarget = id => {
 
+        try {
 
+            let newTargets = []
+
+            targets.value.map( target => {
+
+                if(target.id !== id) {
+
+                    newTargets.push(target)
+                }
+            })
+
+            localStorage.setItem('KTG_LIST', JSON.stringify(targets.value))
+
+        } catch {
+
+            deleteTargetMsg = { success: false, text: translater.getTranslate.ERROR_TARGET_DELETE }
+        }
     }
 
     // Getter
