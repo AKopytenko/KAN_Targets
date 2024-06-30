@@ -5,28 +5,14 @@
     </select>
 </template>
 
-<script>
-import { computed } from 'vue'
-import { useStore } from 'vuex'
+<script setup>
+import { useLangStore } from '@/stores/lang'
 
-export default {
+const langStore = useLangStore()
 
-    name: 'KTGLang',
+const lang = langStore.lang
+const setLang = data => langStore.setLang(data)
 
-    setup() {
-
-        const store = useStore()
-
-        const lang = computed(() => store.state.lang.lang)
-        const setLang = data => store.dispatch('setLang', data)
-
-        return {
-
-            lang,
-            setLang
-        }
-    }
-}
 </script>
 
 <style lang="scss">

@@ -73,112 +73,92 @@
     </div>
 </template>
 
-<script>
+<script setup>
 import { ref, computed, watch } from 'vue'
-import { useStore } from 'vuex'
+import { useTargetsStore }      from '@/stores/targets'
+import { useTranslaterStore }   from '@/stores/translater'
 
-export default {
+const targetsStore      = useTargetsStore()
+const translaterStore   = useTranslaterStore()
 
-    name: 'KTGCreateTarget.vue',
+const getTranslate      = computed(() => translaterStore.getTranslate)
+const createTargetMsg   = computed(() => targetsStore.createTargetMsg)
 
-    setup() {
+const createTarget          = data => targetsStore.createTarget(data)
+const setCreateTargetMsg    = data => targetsStore.setCreateTargetMsg(data)
 
-        const store = useStore()
+let targetName      = ref(''),
+    targetDescr     = ref(''),
+    targetPriority  = ref(false),
+    invalidFields   = ref({}),
+    formErrors      = ref([]),
+    modalShow       = ref(false)
 
-        const createTargetMsg       = computed(() => store.state.targets.createTargetMsg)
-        const getTranslate          = computed(() => store.getters.getTranslate)
-        const createTarget          = data => store.dispatch('createTarget', data)
-        const setCreateTargetMsg    = msg => store.commit('setCreateTargetMsg', msg)
+const sendTargetForm = () => {
 
-        let targetName      = ref(''),
-            targetDescr     = ref(''),
-            targetPriority  = ref(false),
-            invalidFields   = ref({}),
-            formErrors      = ref([]),
-            modalShow       = ref(false)
+    invalidFields.value = {}
+    formErrors.value = []
+    setCreateTargetMsg({})
 
-        const sendTargetForm = () => {
+    let data = {}
 
-            invalidFields.value = {}
-            formErrors.value = []
-            setCreateTargetMsg({})
+    if(targetName.value) {
 
-            let data = {}
+        data.name = targetName.value
 
-            if(targetName.value) {
+    } else {
 
-                data.name = targetName.value
+        invalidFields.value.targetName = true
+        formErrors.value.push(getTranslate.value.ERROR_TARGET_TITLE)
+    }
 
-            } else {
+    if(targetDescr.value) {
 
-                invalidFields.value.targetName = true
-                formErrors.value.push(getTranslate.value.ERROR_TARGET_TITLE)
-            }
+        data.descr = targetDescr.value
 
-            if(targetDescr.value) {
+    } else {
 
-                data.descr = targetDescr.value
+        invalidFields.value.targetDescr = true
+        formErrors.value.push(getTranslate.value.ERROR_TARGET_TEXT)
+    }
 
-            } else {
+    data.priority = targetPriority.value || false
+    data.created = (Date.now() / 1000).toFixed()
 
-                invalidFields.value.targetDescr = true
-                formErrors.value.push(getTranslate.value.ERROR_TARGET_TEXT)
-            }
+    if(formErrors.value.length == 0) {
 
-            data.priority = targetPriority.value.checked || false
-            data.created = (Date.now() / 1000).toFixed()
-
-            if(formErrors.value.length == 0) {
-
-                createTarget(data)
-            }
-        }
-
-        const checkValid = event => {
-
-            event.target.classList.remove('is-invalid')
-        }
-
-        watch(createTargetMsg, async msg => {
-
-            if('success' in msg && msg.success) {
-
-                targetName.value        = '',
-                targetDescr.value       = '',
-                targetPriority.value    = false,
-                modalShow.value         = false
-            }
-        })
-
-        watch(modalShow, async () => {
-
-            if(!modalShow.value) {
-
-                targetName.value      = ''
-                targetDescr.value     = ''
-                targetPriority.value  = false
-
-                setCreateTargetMsg({})
-            }
-        })
-
-        return {
-
-            createTargetMsg,
-            getTranslate, 
-            invalidFields, 
-            formErrors, 
-            modalShow,
-            createTarget,
-            setCreateTargetMsg,
-            targetName,
-            targetDescr,
-            targetPriority,
-            sendTargetForm,
-            checkValid
-        }
+        createTarget(data)
     }
 }
+
+const checkValid = event => {
+
+    event.target.classList.remove('is-invalid')
+}
+
+watch(createTargetMsg, async msg => {
+
+    if('success' in msg && msg.success) {
+
+        targetName.value        = '',
+        targetDescr.value       = '',
+        targetPriority.value    = false,
+        modalShow.value         = false
+    }
+})
+
+watch(modalShow, async () => {
+
+    if(!modalShow.value) {
+
+        targetName.value      = ''
+        targetDescr.value     = ''
+        targetPriority.value  = false
+
+        setCreateTargetMsg({})
+    }
+})
+
 </script>
 
 <style lang="scss">

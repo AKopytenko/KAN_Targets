@@ -58,7 +58,7 @@
                     </template>
 
                     <div class="form-group target__descr">
-                        <span class="target__descrText" v-if="!updateForm" v-html="target.descr.split('\n').join('<br>')"></span>
+                        <span class="target__descrText" v-if="!updateForm" v-html="buildTargetDescr(target)"></span>
                         <textarea v-model="targetDescr" id="targetUpdateDescr" class="form-control target__descrUpdate" v-if="updateForm" rows="6"></textarea>
                     </div>
 
@@ -115,74 +115,62 @@
 
 </template>
 
-<script>
+<script setup>
 import { computed, ref, watch } from 'vue'
-import { useStore } from 'vuex'
+import { useTargetsStore }      from '@/stores/targets'
+import { useTranslaterStore }   from '@/stores/translater'
 
-export default {
+const props = defineProps({
 
-    name: 'KTGTarget',
+    target: {
 
-    props: {
-
-        target: {
-
-            type: Object,
-            require: true
-        }
-    },
-
-    setup(props) {
-
-        const store = useStore()
-
-        const updateTargetMsg       = computed(() => store.state.targets.updateTargetMsg)
-        const getTranslate          = computed(() => store.getters.getTranslate)
-        const updateTarget          = data => store.dispatch('updateTarget', data)
-        const setUpdateTargetMsg    = msg => store.commit('setUpdateTargetMsg', msg)
-
-        let targetId        = ref(props.target.id),
-            targetName      = ref(props.target.name),
-            targetDescr     = ref(props.target.descr),
-            targetCompleted = ref(props.target.completed),
-            targetPriority  = ref(props.target.priority),
-            updateForm      = ref(false)
-
-        function sendUpdateTarget() {
-
-            const data = {
-
-                id:         targetId.value,
-                name:       targetName.value,
-                descr:      targetDescr.value,
-                completed:  targetCompleted.value,
-                priority:   targetPriority.value
-            }
-
-            updateTarget(data)
-        }
-
-        watch(updateTargetMsg, async msg => {
-
-            if(msg.success) updateForm.value = false
-        })
-
-        return {
-
-            updateTargetMsg,
-            getTranslate,
-            updateTarget,
-            setUpdateTargetMsg,
-            targetId,
-            targetName,
-            targetDescr,
-            targetCompleted,
-            targetPriority,
-            updateForm,
-            sendUpdateTarget
-        }
+        type: Object, 
+        required: true
     }
+})
+
+const targetsStore      = useTargetsStore()
+const translaterStore   = useTranslaterStore()
+
+const getTranslate      = computed(() => translaterStore.getTranslate)
+const updateTargetMsg   = computed(() => targetsStore.updateTargetMsg)
+
+const updateTarget          = data => targetsStore.updateTarget(data)
+const setUpdateTargetMsg    = data => targetsStore.setUpdateTargetMsg(data)
+
+let targetId        = ref(props.target.id),
+    targetName      = ref(props.target.name),
+    targetDescr     = ref(props.target.descr),
+    targetCompleted = ref(props.target.completed),
+    targetPriority  = ref(props.target.priority),
+    updateForm      = ref(false)
+
+function buildTargetDescr(target) {
+
+    return target.descr.split('\n').join('<br>')
 }
+
+function sendUpdateTarget() {
+
+    const data = {
+
+        id:         targetId.value,
+        name:       targetName.value,
+        descr:      targetDescr.value,
+        completed:  targetCompleted.value,
+        priority:   targetPriority.value
+    }
+
+    updateTarget(data)
+}
+
+watch(updateTargetMsg, async msg => {
+
+    console.log()
+
+    if(msg.success) updateForm.value = false
+})
+
 </script>
 
 <style lang="scss">

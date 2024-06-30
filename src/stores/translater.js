@@ -1,6 +1,12 @@
-export default {
+import { computed } from 'vue'
+import { defineStore } from 'pinia'
+import { useLangStore } from '@/stores/lang'
 
-    state: {
+export const useTranslaterStore = defineStore('translater', () => {
+
+    const langStore = useLangStore()
+
+    const translates = {
 
         RU: {
 
@@ -28,6 +34,7 @@ export default {
 
             TARGET_DELETE_HEADER:       'Удаление задачи',
             TARGET_DELETE_ALERT:        'Выбранная задача будет удалена без возможности восстановления',
+            TARGET_DELETE_SUCCESS:      'Задача удалена', 
 
             TARGET_UPDATE_SUCCESS:      'Задача успешно отредактирована',
 
@@ -51,7 +58,8 @@ export default {
             ERROR_TARGETS_READ:         'Ошибка чтения задач',
             ERROR_IMPORT_METHOD:        'Не выбран способ загрузки',
             ERROR_IMPORT_FILE:          'Не выбран файл с задачами',
-            ERROR_IMPORT_FILE_FORMAT:   'Неверный формат файла'
+            ERROR_IMPORT_FILE_FORMAT:   'Неверный формат файла', 
+            ERROR_IMPORT_FILE_ID:       'Вы пытаетесь импортировать задачу с ID, который уже есть в системе'
         },
 
         EN: {
@@ -80,8 +88,9 @@ export default {
 
             TARGET_DELETE_HEADER:       'Task delete',
             TARGET_DELETE_ALERT:        'The selected task will be permanently deleted',
+            TARGET_DELETE_SUCCESS:      'Task deleted', 
 
-            TARGET_UPDATE_SUCCESS:      'Target successfully edited ',
+            TARGET_UPDATE_SUCCESS:      'Target successfully edited',
 
             IMPORT_TITLE:               'Import/Export',
             IMPORT_DESCR:               'Upload/Download targets for transfer between devices',
@@ -103,12 +112,16 @@ export default {
             ERROR_TARGETS_READ:         'Reading targets error',
             ERROR_IMPORT_METHOD:        'Download method not selected',
             ERROR_IMPORT_FILE:          'Targets file is not selected',
-            ERROR_IMPORT_FILE_FORMAT:   'Invalid file format'
+            ERROR_IMPORT_FILE_FORMAT:   'Invalid file format', 
+            ERROR_IMPORT_FILE_ID:       'You are trying to import a task with an ID that is already in the system'
         }
-    },
-
-    getters: {
-
-        getTranslate: ( state, getters, rootState) => state[rootState.lang.lang]
     }
-}
+
+    const getTranslate = computed(() => translates[langStore.lang])
+
+    return {
+
+        translates,
+        getTranslate
+    }
+})

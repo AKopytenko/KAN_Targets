@@ -31,7 +31,15 @@
                 <div class="alert alert-danger mt-4 ktg-targets__searchError" v-if="filteredTargetsEmpty">{{ filteredTargetsEmpty }}</div>
             </div>
 
-            <div class="ktg-targets__list my-4" v-if="targets.value.length">
+            <div 
+                class="alert alert-danger alert-dismissible mt-4 ktg-targets__message" 
+                v-if="'success' in deleteTargetMsg && deleteTargetMsg.success"
+            >
+                {{ deleteTargetMsg.text }}
+                <button type="button" class="btn-close" aria-label="Close" @click="setDeleteTargetMsg({})"></button>
+            </div>
+
+            <div class="ktg-targets__list my-4" v-if="Object.keys(targets.value).length">
                 <div class="accordion ktg-targets__accordion" id="targetsList">
                     <template v-for="target in targets.value" :key="target.id">
                         <KTGTarget 
@@ -62,7 +70,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ getTranslate.BTN_CANCEL }}</button>
-                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @click="deleteTarget(deleteTargetID)">{{ getTranslate.BTN_DELETE }}</button>
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @click="targetsStore.deleteTarget(deleteTargetID)">{{ getTranslate.BTN_DELETE }}</button>
                     </div>
                 </div>
             </div>
@@ -71,112 +79,75 @@
     </div>
 </template>
 
-<script>
-import 'bootstrap'
-
-import { ref, computed, watch }    from 'vue'
-import { useStore }         from 'vuex'
+<script setup>
+import { ref, computed, watch } from 'vue'
+import { useTargetsStore }      from '@/stores/targets'
+import { useTranslaterStore }   from '@/stores/translater'
 
 import KTGLang          from '@/components/KTGLang'
 import KTGTarget        from '@/components/KTGTarget'
 import KTGCreateTarget  from '@/components/KTGCreateTarget'
 import KTGImportTargets from '@/components/KTGImportTargets'
 
-export default {
+const targetsStore      = useTargetsStore()
+const translaterStore   = useTranslaterStore()
 
-    name: 'KTGTargets',
+const getTranslate          = computed(() => translaterStore.getTranslate)
+const storeTargets          = computed(() => targetsStore.targets)
+const targets               = computed(() => filteredTargets.value.length ? filteredTargets : storeTargets)
+const deleteTargetMsg       = computed(() => targetsStore.deleteTargetMsg)
+const setDeleteTargetMsg    = data => targetsStore.setDeleteTargetMsg(data)
 
-    setup() {
+let deleteTargetID          = ref(),
+    showInputSearchClean    = ref(false),
+    filteredTargets         = ref([]),
+    filteredTargetsEmpty    = ref(),
+    inputSearch             = ref('')
 
-        const store = useStore()
+const filterTargets = input => {
 
-        const getTranslate  = computed(() => store.getters.getTranslate)
-        const getTargets    = computed(() => store.getters.getTargets)
-        const targets       = computed(() => filteredTargets.value.length ? filteredTargets : getTargets)
+    filteredTargets.value = []
+    filteredTargetsEmpty.value = null
 
-        const readTargets   = () => store.dispatch('readTargets')
-        const deleteTarget  = id => store.dispatch('deleteTarget', id)
+    if(input && input.length > 2) {
 
-        let deleteTargetID          = ref(),
-            showInputSearchClean    = ref(false),
-            filteredTargets         = ref([]),
-            filteredTargetsEmpty    = ref(),
-            inputSearch             = ref(''),
-            searchTargetsIcon       = ref()
+        showInputSearchClean.value = true
 
-        const filterTargets = input => {
+        if(storeTargets.value.length) {
 
-            filteredTargets.value = []
-            filteredTargetsEmpty.value = null
+            for(let target of storeTargets.value) {
 
-            if(input && input.length > 2) {
+                const reg = new RegExp(input.toUpperCase(), 'g')
 
-                showInputSearchClean.value = true
+                if( reg.test(target.name.toUpperCase()) || reg.test(target.descr.toUpperCase()) ) {
 
-                if(getTargets.value.length) {
-
-                    for(let target of getTargets.value) {
-
-                        const reg = new RegExp(input.toUpperCase(), 'g')
-
-                        if( reg.test(target.name.toUpperCase()) || reg.test(target.descr.toUpperCase()) ) {
-
-                            filteredTargets.value.push(target)
-                        }
-                    }
-
-                    if(filteredTargets.value.length == 0) {
-
-                        filteredTargets.value = []
-                        filteredTargetsEmpty.value = getTranslate.value.ERROR_SEARCH_EMPTY
-                    }
+                    filteredTargets.value.push(target)
                 }
+            }
 
-            } else {
+            if(filteredTargets.value.length == 0) {
 
-                showInputSearchClean.value = false
                 filteredTargets.value = []
-                filteredTargetsEmpty.value = null
+                filteredTargetsEmpty.value = getTranslate.value.ERROR_SEARCH_EMPTY
             }
         }
 
-        const setDeleteTargetID = id => deleteTargetID.value = id
+    } else {
 
-        readTargets()
-
-        watch(inputSearch, async (text) => {
-
-            filterTargets(text)
-        })
-
-        return {
-
-            deleteTargetID,
-            showInputSearchClean, 
-            filteredTargets,
-            filteredTargetsEmpty,
-            inputSearch,
-            searchTargetsIcon,
-
-            getTranslate,
-            getTargets,
-            targets,
-
-            readTargets,
-            deleteTarget,
-            setDeleteTargetID, 
-            filterTargets
-        }
-    },
-
-    components: {
-
-        KTGLang,
-        KTGTarget,
-        KTGCreateTarget,
-        KTGImportTargets
+        showInputSearchClean.value = false
+        filteredTargets.value = []
+        filteredTargetsEmpty.value = null
     }
 }
+
+const setDeleteTargetID = id => deleteTargetID.value = id
+
+targetsStore.readTargets()
+
+watch(inputSearch, async (text) => {
+
+    filterTargets(text)
+})
 </script>
 
 <style lang="scss">

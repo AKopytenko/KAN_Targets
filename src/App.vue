@@ -4,33 +4,19 @@
     </div>
 </template>
 
-<script>
-import { useStore } from 'vuex'
+<script setup>
+import { useLangStore } from '@/stores/lang'
 import KTGTargets from './components/KTGTargets.vue'
 
-export default {
+const langStore = useLangStore()
 
-    name: 'App',
+const localLang = localStorage.getItem('KTG_LANG')
 
-    components: {
+if(localLang) {
 
-        KTGTargets
-    },
-
-    setup() {
-
-        const store = useStore()
-
-        const localLang = localStorage.getItem('KTG_LANG')
-
-        const setLang = lang => store.dispatch('setLang', lang)
-
-        if(localLang) {
-
-            setLang(localLang)
-        }
-    }
+    langStore.setLang(localLang)
 }
+
 </script>
 
 <style lang="scss">
