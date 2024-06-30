@@ -75,14 +75,17 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { useStore } from 'vuex'
+import { useTargetsStore }      from '@/stores/targets'
+import { useTranslaterStore }   from '@/stores/translater'
 
-const store = useStore()
+const targetsStore      = useTargetsStore()
+const translaterStore   = useTranslaterStore()
 
-const createTargetMsg       = computed(() => store.state.targets.createTargetMsg)
-const getTranslate          = computed(() => store.getters.getTranslate)
-const createTarget          = data => store.dispatch('createTarget', data)
-const setCreateTargetMsg    = msg => store.commit('setCreateTargetMsg', msg)
+const getTranslate      = computed(() => translaterStore.getTranslate)
+const createTargetMsg   = computed(() => targetsStore.createTargetMsg)
+
+const createTarget          = data => targetsStore.createTarget(data)
+const setCreateTargetMsg    = data => targetsStore.setCreateTargetMsg(data)
 
 let targetName      = ref(''),
     targetDescr     = ref(''),
@@ -119,7 +122,7 @@ const sendTargetForm = () => {
         formErrors.value.push(getTranslate.value.ERROR_TARGET_TEXT)
     }
 
-    data.priority = targetPriority.value.checked || false
+    data.priority = targetPriority.value || false
     data.created = (Date.now() / 1000).toFixed()
 
     if(formErrors.value.length == 0) {

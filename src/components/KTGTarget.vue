@@ -58,7 +58,7 @@
                     </template>
 
                     <div class="form-group target__descr">
-                        <span class="target__descrText" v-if="!updateForm" v-html="target.descr.split('\n').join('<br>')"></span>
+                        <span class="target__descrText" v-if="!updateForm" v-html="buildTargetDescr(target)"></span>
                         <textarea v-model="targetDescr" id="targetUpdateDescr" class="form-control target__descrUpdate" v-if="updateForm" rows="6"></textarea>
                     </div>
 
@@ -117,7 +117,8 @@
 
 <script setup>
 import { computed, ref, watch } from 'vue'
-import { useStore } from 'vuex'
+import { useTargetsStore }      from '@/stores/targets'
+import { useTranslaterStore }   from '@/stores/translater'
 
 const props = defineProps({
 
@@ -128,12 +129,14 @@ const props = defineProps({
     }
 })
 
-const store = useStore()
+const targetsStore      = useTargetsStore()
+const translaterStore   = useTranslaterStore()
 
-const updateTargetMsg       = computed(() => store.state.targets.updateTargetMsg)
-const getTranslate          = computed(() => store.getters.getTranslate)
-const updateTarget          = data => store.dispatch('updateTarget', data)
-const setUpdateTargetMsg    = msg => store.commit('setUpdateTargetMsg', msg)
+const getTranslate      = computed(() => translaterStore.getTranslate)
+const updateTargetMsg   = computed(() => targetsStore.updateTargetMsg)
+
+const updateTarget          = data => targetsStore.updateTarget(data)
+const setUpdateTargetMsg    = data => targetsStore.setUpdateTargetMsg(data)
 
 let targetId        = ref(props.target.id),
     targetName      = ref(props.target.name),
@@ -141,6 +144,11 @@ let targetId        = ref(props.target.id),
     targetCompleted = ref(props.target.completed),
     targetPriority  = ref(props.target.priority),
     updateForm      = ref(false)
+
+function buildTargetDescr(target) {
+
+    return target.descr.split('\n').join('<br>')
+}
 
 function sendUpdateTarget() {
 
@@ -157,6 +165,8 @@ function sendUpdateTarget() {
 }
 
 watch(updateTargetMsg, async msg => {
+
+    console.log()
 
     if(msg.success) updateForm.value = false
 })

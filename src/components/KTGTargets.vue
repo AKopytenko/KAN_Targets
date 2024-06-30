@@ -31,7 +31,15 @@
                 <div class="alert alert-danger mt-4 ktg-targets__searchError" v-if="filteredTargetsEmpty">{{ filteredTargetsEmpty }}</div>
             </div>
 
-            <div class="ktg-targets__list my-4" v-if="targets.value.length">
+            <div 
+                class="alert alert-danger alert-dismissible mt-4 ktg-targets__message" 
+                v-if="'success' in deleteTargetMsg && deleteTargetMsg.success"
+            >
+                {{ deleteTargetMsg.text }}
+                <button type="button" class="btn-close" aria-label="Close" @click="setDeleteTargetMsg({})"></button>
+            </div>
+
+            <div class="ktg-targets__list my-4" v-if="Object.keys(targets.value).length">
                 <div class="accordion ktg-targets__accordion" id="targetsList">
                     <template v-for="target in targets.value" :key="target.id">
                         <KTGTarget 
@@ -62,7 +70,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ getTranslate.BTN_CANCEL }}</button>
-                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @click="deleteTarget(deleteTargetID)">{{ getTranslate.BTN_DELETE }}</button>
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @click="targetsStore.deleteTarget(deleteTargetID)">{{ getTranslate.BTN_DELETE }}</button>
                     </div>
                 </div>
             </div>
@@ -73,21 +81,22 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { useStore } from 'vuex'
+import { useTargetsStore }      from '@/stores/targets'
+import { useTranslaterStore }   from '@/stores/translater'
 
 import KTGLang          from '@/components/KTGLang'
 import KTGTarget        from '@/components/KTGTarget'
 import KTGCreateTarget  from '@/components/KTGCreateTarget'
 import KTGImportTargets from '@/components/KTGImportTargets'
 
-const store = useStore()
+const targetsStore      = useTargetsStore()
+const translaterStore   = useTranslaterStore()
 
-const getTranslate  = computed(() => store.getters.getTranslate)
-const getTargets    = computed(() => store.getters.getTargets)
-const targets       = computed(() => filteredTargets.value.length ? filteredTargets : getTargets)
-
-const readTargets   = () => store.dispatch('readTargets')
-const deleteTarget  = id => store.dispatch('deleteTarget', id)
+const getTranslate          = computed(() => translaterStore.getTranslate)
+const storeTargets          = computed(() => targetsStore.targets)
+const targets               = computed(() => filteredTargets.value.length ? filteredTargets : storeTargets)
+const deleteTargetMsg       = computed(() => targetsStore.deleteTargetMsg)
+const setDeleteTargetMsg    = data => targetsStore.setDeleteTargetMsg(data)
 
 let deleteTargetID          = ref(),
     showInputSearchClean    = ref(false),
@@ -104,9 +113,9 @@ const filterTargets = input => {
 
         showInputSearchClean.value = true
 
-        if(getTargets.value.length) {
+        if(storeTargets.value.length) {
 
-            for(let target of getTargets.value) {
+            for(let target of storeTargets.value) {
 
                 const reg = new RegExp(input.toUpperCase(), 'g')
 
@@ -133,7 +142,7 @@ const filterTargets = input => {
 
 const setDeleteTargetID = id => deleteTargetID.value = id
 
-readTargets()
+targetsStore.readTargets()
 
 watch(inputSearch, async (text) => {
 

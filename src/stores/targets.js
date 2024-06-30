@@ -35,7 +35,7 @@ export const useTargetsStore = defineStore('targets', () => {
                 return 0
             })
 
-            const lastTarget = targets[targets.value.length - 1] // Последний элемент массива
+            const lastTarget = targets.value[targets.value.length - 1]
             createTarget.id = Number(lastTarget.id) + 1
 
         } else {
@@ -57,9 +57,20 @@ export const useTargetsStore = defineStore('targets', () => {
         }
     }
 
+    const setTargets = targets => {
+
+        targets.value = targets
+        localStorage.setItem( 'KTG_LIST', JSON.stringify(targets) )
+    }
+
     const readTargets = () => {
 
-        return localStorage.getItem('KTG_TARGETS')
+        const localTargets = localStorage.getItem('KTG_LIST')
+
+        if(localTargets) {
+
+            targets.value = JSON.parse(localTargets) || []
+        }
     }
 
     const updateTarget = data => {
@@ -80,11 +91,11 @@ export const useTargetsStore = defineStore('targets', () => {
             localStorage.removeItem('KTG_LIST')
             localStorage.setItem('KTG_LIST', JSON.stringify(targets.value))
 
-            updateTargetMsg = { success: true, text: translater.getTranslate.TARGET_UPDATE_SUCCESS, id: data.id }
+            updateTargetMsg.value = { success: true, text: translater.getTranslate.TARGET_UPDATE_SUCCESS, id: data.id }
 
         } catch {
 
-            updateTargetMsg = { success: false, text: translater.getTranslate.ERROR_TARGET_EDIT, id: data.id }
+            updateTargetMsg.value = { success: false, text: translater.getTranslate.ERROR_TARGET_EDIT, id: data.id }
         }
     }
 
@@ -92,29 +103,20 @@ export const useTargetsStore = defineStore('targets', () => {
 
         try {
 
-            let newTargets = []
-
-            targets.value.map( target => {
-
-                if(target.id !== id) {
-
-                    newTargets.push(target)
-                }
-            })
-
+            targets.value = targets.value.filter( target => target.id !== id)
             localStorage.setItem('KTG_LIST', JSON.stringify(targets.value))
+
+            deleteTargetMsg.value = { success: true, text: translater.getTranslate.TARGET_DELETE_SUCCESS }
 
         } catch {
 
-            deleteTargetMsg = { success: false, text: translater.getTranslate.ERROR_TARGET_DELETE }
+            deleteTargetMsg.value = { success: false, text: translater.getTranslate.ERROR_TARGET_DELETE }
         }
     }
 
-    // Getter
-    // const doubleCount = computed(() => count.value * 2)
-
-    // Action
-    // const increment = num => count.value = num
+    const setCreateTargetMsg = data => createTargetMsg.value = data
+    const setUpdateTargetMsg = data => updateTargetMsg.value = data
+    const setDeleteTargetMsg = data => deleteTargetMsg.value = data
 
     return { 
 
@@ -124,9 +126,13 @@ export const useTargetsStore = defineStore('targets', () => {
         updateTargetMsg, 
         deleteTargetMsg,
 
-        createTarget,
+        createTarget, 
+        setTargets, 
         readTargets,
-        updateTarget,
-        deleteTarget
+        updateTarget, 
+        deleteTarget,
+        setCreateTargetMsg,
+        setUpdateTargetMsg,
+        setDeleteTargetMsg
     }
 })

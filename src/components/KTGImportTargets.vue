@@ -106,18 +106,20 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useStore } from 'vuex'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useTargetsStore }          from '@/stores/targets'
+import { useTranslaterStore }       from '@/stores/translater'
 
-const store = useStore()
+const targetsStore      = useTargetsStore()
+const translaterStore   = useTranslaterStore()
 
 let invalidFields     = ref({}),
     formErrors        = ref([]),
     importTargetsMsg  = ref({})
 
-const storeTargets  = computed(() => store.state.targets.targets)
-const getTranslate  = computed(() => store.getters.getTranslate)
-const setTargets    = msg => store.commit('setTargets', msg)
+const getTranslate  = computed(() => translaterStore.getTranslate)
+const storeTargets  = computed(() => targetsStore.targets)
+const setTargets    = msg => targetsStore.setTargets(msg)
 
 function downloadTargets() {
 
@@ -149,8 +151,11 @@ function uploadTargets(event) {
     formErrors.value = []
 
     if(fields.importTargetsMethod.value) {
+
         data.method = fields.importTargetsMethod.value
+
     } else {
+
         invalidFields.value.importTargetsMethod = true
         formErrors.value.push(getTranslate.value.ERROR_IMPORT_METHOD)
     }
@@ -162,12 +167,17 @@ function uploadTargets(event) {
             fileExt  = file.name.split('.')[1]
 
         if( fileType == 'text/plain' || fileExt == 'txt' ) {
+
             data.file = fields.importTargetsFile.files[0]
+
         } else {
+
             invalidFields.value.importTargetsFile = true
             formErrors.value.push(getTranslate.value.ERROR_IMPORT_FILE_FORMAT)
         }
+
     } else {
+
         invalidFields.value.importTargetsFile = true
         formErrors.value.push(getTranslate.value.ERROR_IMPORT_FILE)
     }
@@ -209,6 +219,8 @@ function uploadTargets(event) {
                                     created:    target.created
                                 })
 
+                                importTargetsMsg = {  }
+
                             } else {
 
                                 importTargetsMsg = { success: false, text: getTranslate.value.ERROR_IMPORT_FILE_FORMAT }
@@ -223,6 +235,7 @@ function uploadTargets(event) {
                     }
 
                     setTargets(newTargets)
+                    targetsStore.readTargets()
 
                     importTargetsMsg = { success: true, text: getTranslate.value.IMPORT_SUCCESS }
                 }
@@ -238,13 +251,11 @@ function uploadTargets(event) {
                     try {
 
                         const fileContent = JSON.parse(event.target.result)
-
                         let targetID = 0
 
                         if(storeTargets.value.length) {
 
                             const allIDs = storeTargets.value.map( target => target.id )
-
                             targetID = Math.max.apply(null, allIDs) + 1
                         }
 
@@ -285,6 +296,7 @@ function uploadTargets(event) {
                     newTargets = [...storeTargets.value, ...newTargets]
 
                     setTargets(newTargets)
+                    targetsStore.readTargets()
 
                     importTargetsMsg = { success: true, text: getTranslate.value.IMPORT_SUCCESS }
                 }
@@ -306,6 +318,11 @@ onMounted(() => {
         importTargetsMsg.value = {}
         document.querySelector('#importTargetsForm').reset()
     })
+})
+
+watch(importTargetsMsg, async (msg) => {
+
+    console.log(msg)
 })
 
 </script>
